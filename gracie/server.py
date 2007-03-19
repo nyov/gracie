@@ -21,7 +21,7 @@ from httprequest import HTTPRequestHandler
 from httpserver import HTTPServer, default_host, default_port
 from authservice import PamAuthService as AuthService
 
-__version__ = "0.0"
+__version__ = "0.1"
 
 # Name of the Python logging instance to use for this module
 logger_name = "gracie.server"
