@@ -1,0 +1,76 @@
+% GRACIED(8) Gracie user manual
+% Ben Finney <ben+debian@benfinney.id.au>
+% 2008-09-23
+
+Name
+####
+
+|command| – local-authentication OpenID server
+
+..  |command| gracied
+
+Synopsis
+########
+
+|command| --data-dir `DIR` --host `HOST` --port `PORT` --log-level `LEVEL`
+
+Description
+###########
+
+This manual page documents briefly the |command| command.
+
+|command| is the Gracie server program. It runs an OpenID provider
+service for local system users, and allows those users to authenticate
+against the local PAM system via a web interface.
+
+Options
+#######
+
+-h  --help
+    Show summary of options.
+
+-v  --version
+    Show version of program.
+
+--data-dir `DIR`
+    Use `DIR` as the directory to store server state files.
+    Default: current directory.
+
+--host `HOST`
+    Listen for connections on host address `HOST`.
+    Default: localhost.
+
+--port `PORT`
+    Listen for connections on port `PORT`.
+    Default: http (port 80).
+
+--log-level `LEVEL`
+    Set the log message threshold to `LEVEL`.
+    Default: WARN.
+
+See also
+########
+
+The OpenID project page <http://openid.net/>_.
+
+Author
+######
+
+This manual page was written by |authorname| |authoremail| for the
+Debian system (but may be used by others). Permission is granted to
+copy, distribute and/or modify this document under the terms of the
+GNU General Public License, Version 2 or any later version published
+by the Free Software Foundation.
+
+On Debian systems, the complete text of the GNU General Public License
+can be found in /usr/share/common-licenses/GPL.
+
+..  |authorname| Ben Finney
+..  |authoremail| <ben+debian@benfinney.id.au>
+
+..
+    Local variables:
+    mode: rst
+    coding: utf-8
+    End:
+    vim: filetype=rst fileencoding=utf-8 :
