@@ -22,12 +22,12 @@ author_name = "Ben Finney"
 author_email = "ben+python@benfinney.id.au"
 author = "%(author_name)s <%(author_email)s>" % vars()
 
-date = version_info['date'].split(' ', 1)[0]
 copyright_year_begin = "2007"
+date = version_info['date'].split(' ', 1)[0]
 copyright_year = date.split('-')[0]
 copyright_year_range = copyright_year_begin
 if copyright_year > copyright_year_begin:
-    copyright_year_range += "..%(copyright_year)s" % vars()
+    copyright_year_range += "–%(copyright_year)s" % vars()
 
 copyright = "Copyright © %(copyright_year_range)s %(author)s" % vars()
-license = "GPL"
+license = "GPL-2+"
