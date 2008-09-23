@@ -21,6 +21,8 @@ import bzrlib
 import bzrlib.workingtree
 import bzrlib.export
 from bzrlib import version_info_formats
+import bzrlib.plugin
+bzrlib.plugin.load_plugins()
 
 workingtree = bzrlib.workingtree.WorkingTree.open_containing()[0]
 sys.path.insert(1, workingtree.basedir)
