@@ -4,7 +4,7 @@
 # gracie
 # Part of Gracie, an OpenID provider
 #
-# Copyright © 2007 Ben Finney <ben+python@benfinney.id.au>
+# Copyright © 2007..2008 Ben Finney <ben+python@benfinney.id.au>
 # This is free software; you may copy, modify and/or distribute this work
 # under the terms of the GNU General Public License, version 2 or later.
 # No warranty expressed or implied. See the file LICENSE for details.
@@ -34,40 +34,46 @@ class OptionParser(optparse.OptionParser):
     def init_options(self):
         """ Set up options """
 
-        self.add_option('-V', '--version',
+        self.add_option(
+            '-V', '--version',
             action='version',
             help="Report version of program and exit",
-        )
-        self.add_option('--log-level',
+            )
+        self.add_option(
+            '--log-level',
             action='store', type='string', default="WARN",
             dest='loglevel', metavar='LEVEL',
             help="Set logging verbosity level to LEVEL"
                  " (default %default)",
-        )
-        self.add_option('--data-dir',
+            )
+        self.add_option(
+            '--data-dir',
             action='store', type='string', default="/var/lib/gracie",
             dest='datadir', metavar='DIR',
             help="Store server runtime data in directory DIR"
                  " (default %default)",
-        )
-        self.add_option('--host',
+            )
+        self.add_option(
+            '--host',
             action='store', type='string', default=default_host,
             dest='host', metavar='HOST',
             help="Listen on address HOST; can be name or address"
                  " (default %default)",
-        )
-        self.add_option('--port',
+            )
+        self.add_option(
+            '--port',
             action='store', type='int', default=default_port,
             dest='port', metavar='PORT',
             help="Listen on TCP port PORT"
                  " (default %default)",
-        )
-        self.add_option('--root-url',
+            )
+        self.add_option(
+            '--root-url',
             action='store', type='string', default=default_root_url,
             dest='root_url', metavar='URL',
             help="Set root URL of the server to URL"
                  " (default %default)",
-        )
+            )
 
 
 class Gracie(object):
@@ -100,7 +106,7 @@ class Gracie(object):
         logging.basicConfig(
             level = level,
             format = format, datefmt = time_format,
-        )
+            )
 
     def _get_socket_params(self):
         """ Determine the server socket parameters """
