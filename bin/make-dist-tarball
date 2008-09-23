@@ -94,6 +94,11 @@ version_info_module_export = os.path.join(
     export_dir_path, version_info_module_relpath)
 shutil.copy(version_info_module_path, version_info_module_export)
 
+# This program won't work outside the VCS branch; exclude it from the export.
+this_program_export = os.path.join(
+    export_dir_path, "bin", "make-dist-tarball")
+os.remove(this_program_export)
+
 
 def make_dist_tarball(tarball_path, tree_root):
     """ Create a named tarball from the specified directory tree """
