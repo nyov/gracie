@@ -37,6 +37,17 @@ def remove_standard_files():
     sys.stdout = NullDevice()
     sys.stderr = NullDevice()
 
+pidfile_name = "gracied.pid"
+
+def create_pid_file(pid):
+    """ Create a PID file with the specified process ID """
+    pidfile = open(pidfile_name, 'w')
+    pidfile.write("%(pid)d\n" % vars())
+
+def remove_pid_file():
+    """ Remove the PID file for this daemon """
+    os.remove(pidfile_name)
+
 def become_daemon():
     """ Detach the current process and run as a daemon """
     # This technique cribbed from Chad J. Schroeder,
@@ -63,6 +74,8 @@ def become_daemon():
         # This is the parent process of the first fork
         # so we want to exit, leaving only the child to run
         os._exit(os.EX_OK)
+
+    create_pid_file(pid)
 
     remove_standard_files()
 

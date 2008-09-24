@@ -12,6 +12,7 @@
 """ Unit test for server module
 """
 
+import __builtin__
 import sys
 import os
 from StringIO import StringIO
@@ -42,6 +43,74 @@ class Test_remove_standard_files(scaffold.TestCase):
         scaffold.mock_restore()
 
 
+class Test_create_pid_file(scaffold.TestCase):
+    """ Test cases for create_pid_file function """
+
+    def setUp(self):
+        """ Set up test fixtures """
+        self.mock_outfile = StringIO()
+
+        self.mock_pidfile = StringIO()
+        scaffold.mock(
+            "__builtin__.open",
+            returns=self.mock_pidfile,
+            outfile=self.mock_outfile)
+
+    def tearDown(self):
+        """ Tear down test fixtures """
+        scaffold.mock_restore()
+
+    def test_creates_file(self):
+        """ Should create the file """
+        pid = 23
+        pidfile_name = "gracied.pid"
+        expect_mock_output = """\
+            Called __builtin__.open(%(pidfile_name)r, ...)
+            """ % vars()
+        server.create_pid_file(pid)
+        scaffold.mock_restore()
+        self.failUnlessOutputCheckerMatch(
+            expect_mock_output, self.mock_outfile.getvalue()
+            )
+
+    def test_writes_pid_to_file(self):
+        """ Should write the specified PID in the correct format """
+        pid = 23
+        expect_pidfile_content = "%(pid)d\n" % vars()
+        server.create_pid_file(pid)
+        scaffold.mock_restore()
+        self.failUnlessEqual(
+            expect_pidfile_content, self.mock_pidfile.getvalue()
+            )
+
+
+class Test_remove_pid_file(scaffold.TestCase):
+    """ Test cases for remove_pid_file function """
+
+    def setUp(self):
+        """ Set up test fixtures """
+        self.mock_outfile = StringIO()
+
+        scaffold.mock(
+            "os.remove",
+            outfile=self.mock_outfile)
+
+    def tearDown(self):
+        """ Tear down test fixtures """
+        scaffold.mock_restore()
+
+    def test_removes_expected_file(self):
+        """ Should remove the expected file """
+        mock_pidfile = "gracied.pid"
+        expect_mock_output = """\
+            Called os.remove(%(mock_pidfile)r)
+            """ % vars()
+        server.remove_pid_file()
+        self.failUnlessOutputCheckerMatch(
+            expect_mock_output, self.mock_outfile.getvalue()
+            )
+
+
 class Test_become_daemon(scaffold.TestCase):
     """ Test cases for become_daemon function """
 
@@ -57,6 +126,8 @@ class Test_become_daemon(scaffold.TestCase):
         scaffold.mock("os._exit",
             outfile=self.mock_outfile)
         scaffold.mock("sys.exit",
+            outfile=self.mock_outfile)
+        scaffold.mock("server.create_pid_file",
             outfile=self.mock_outfile)
         scaffold.mock("server.remove_standard_files",
             outfile=self.mock_outfile)
@@ -115,8 +186,25 @@ class Test_become_daemon(scaffold.TestCase):
             Called os.fork()
             Called os.setsid()
             Called os.fork()
-            Called server.remove_standard_files()
+            Called server.create_pid_file(...)
+            ...
             """
+        server.become_daemon()
+        self.failUnlessOutputCheckerMatch(
+            expect_mock_output, self.mock_outfile.getvalue()
+            )
+
+    def test_creates_pid_file_with_own_pid(self):
+        """ Should request creation of a PID file with its own PID """
+        daemon_pid = 13
+        test_pids = [0, daemon_pid]
+        scaffold.mock("os.fork", returns_iter=test_pids,
+            outfile=self.mock_outfile)
+        expect_mock_output = """\
+            ...
+            Called server.create_pid_file(%(daemon_pid)r)
+            ...
+            """ % vars()
         server.become_daemon()
         self.failUnlessOutputCheckerMatch(
             expect_mock_output, self.mock_outfile.getvalue()
