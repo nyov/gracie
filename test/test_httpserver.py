@@ -63,6 +63,7 @@ class Test_HTTPServer(scaffold.TestCase):
         """ Set up test fixtures """
 
         self.mock_outfile = StringIO()
+        self.mock_tracker = scaffold.MockTracker(self.mock_outfile)
 
         self.server_class = httpserver.HTTPServer
 
@@ -122,7 +123,7 @@ class Test_HTTPServer(scaffold.TestCase):
         params = self.valid_servers['simple']
         server_module = sys.modules['gracie.server']
         scaffold.mock(
-            "server_module.version", outfile=self.mock_outfile)
+            "server_module.version", tracker=self.mock_tracker)
         version_test = Stub_GracieServer.version
         server_module.version.version_full = version_test
         instance = self.server_class(**params['args'])

@@ -30,13 +30,14 @@ class Test_remove_standard_files(scaffold.TestCase):
     def setUp(self):
         """ Set up test fixtures """
         self.mock_outfile = StringIO()
+        self.mock_tracker = scaffold.MockTracker(self.mock_outfile)
 
-        scaffold.mock("sys.stdin",
-            outfile=self.mock_outfile)
-        scaffold.mock("sys.stdout",
-            outfile=self.mock_outfile)
-        scaffold.mock("sys.stderr",
-            outfile=self.mock_outfile)
+        scaffold.mock(
+            "sys.stdin", tracker=self.mock_tracker)
+        scaffold.mock(
+            "sys.stdout", tracker=self.mock_tracker)
+        scaffold.mock(
+            "sys.stderr", tracker=self.mock_tracker)
 
     def tearDown(self):
         """ Tear down test fixtures """
@@ -49,12 +50,13 @@ class Test_create_pid_file(scaffold.TestCase):
     def setUp(self):
         """ Set up test fixtures """
         self.mock_outfile = StringIO()
+        self.mock_tracker = scaffold.MockTracker(self.mock_outfile)
 
         self.mock_pidfile = StringIO()
         scaffold.mock(
             "__builtin__.open",
             returns=self.mock_pidfile,
-            outfile=self.mock_outfile)
+            tracker=self.mock_tracker)
 
     def tearDown(self):
         """ Tear down test fixtures """
@@ -90,10 +92,11 @@ class Test_remove_pid_file(scaffold.TestCase):
     def setUp(self):
         """ Set up test fixtures """
         self.mock_outfile = StringIO()
+        self.mock_tracker = scaffold.MockTracker(self.mock_outfile)
 
         scaffold.mock(
             "os.remove",
-            outfile=self.mock_outfile)
+            tracker=self.mock_tracker)
 
     def tearDown(self):
         """ Tear down test fixtures """
@@ -117,20 +120,27 @@ class Test_become_daemon(scaffold.TestCase):
     def setUp(self):
         """ Set up test fixtures """
         self.mock_outfile = StringIO()
+        self.mock_tracker = scaffold.MockTracker(self.mock_outfile)
 
         test_pids = [0, 0]
-        scaffold.mock("os.fork", returns_iter=test_pids,
-            outfile=self.mock_outfile)
-        scaffold.mock("os.setsid",
-            outfile=self.mock_outfile)
-        scaffold.mock("os._exit",
-            outfile=self.mock_outfile)
-        scaffold.mock("sys.exit",
-            outfile=self.mock_outfile)
-        scaffold.mock("server.create_pid_file",
-            outfile=self.mock_outfile)
-        scaffold.mock("server.remove_standard_files",
-            outfile=self.mock_outfile)
+        scaffold.mock(
+            "os.fork", returns_iter=test_pids,
+            tracker=self.mock_tracker)
+        scaffold.mock(
+            "os.setsid",
+            tracker=self.mock_tracker)
+        scaffold.mock(
+            "os._exit",
+            tracker=self.mock_tracker)
+        scaffold.mock(
+            "sys.exit",
+            tracker=self.mock_tracker)
+        scaffold.mock(
+            "server.create_pid_file",
+            tracker=self.mock_tracker)
+        scaffold.mock(
+            "server.remove_standard_files",
+            tracker=self.mock_tracker)
 
     def tearDown(self):
         """ Tear down test fixtures """
@@ -139,8 +149,9 @@ class Test_become_daemon(scaffold.TestCase):
     def test_parent_exits(self):
         """ become_daemon parent process should exit """
         parent_pid = 23
-        scaffold.mock("os.fork", returns_iter=[parent_pid],
-            outfile=self.mock_outfile)
+        scaffold.mock(
+            "os.fork", returns_iter=[parent_pid],
+            tracker=self.mock_tracker)
         expect_mock_output = """\
             Called os.fork()
             Called os._exit(0)
@@ -166,8 +177,9 @@ class Test_become_daemon(scaffold.TestCase):
     def test_child_forks_next_parent_exits(self):
         """ become_daemon should fork, then exit if parent """
         test_pids = [0, 42]
-        scaffold.mock("os.fork", returns_iter=test_pids,
-            outfile=self.mock_outfile)
+        scaffold.mock(
+            "os.fork", returns_iter=test_pids,
+            tracker=self.mock_tracker)
         expect_mock_output = """\
             Called os.fork()
             Called os.setsid()
@@ -198,8 +210,9 @@ class Test_become_daemon(scaffold.TestCase):
         """ Should request creation of a PID file with its own PID """
         daemon_pid = 13
         test_pids = [0, daemon_pid]
-        scaffold.mock("os.fork", returns_iter=test_pids,
-            outfile=self.mock_outfile)
+        scaffold.mock(
+            "os.fork", returns_iter=test_pids,
+            tracker=self.mock_tracker)
         expect_mock_output = """\
             ...
             Called server.create_pid_file(%(daemon_pid)r)
@@ -377,28 +390,35 @@ class Test_GracieServer(scaffold.TestCase):
     def setUp(self):
         """ Set up test fixtures """
         self.mock_outfile = StringIO()
+        self.mock_tracker = scaffold.MockTracker(self.mock_outfile)
 
         self.server_class = server.GracieServer
 
-        scaffold.mock("server.OpenIDServer",
+        scaffold.mock(
+            "server.OpenIDServer",
             mock_obj=Stub_OpenIDServer,
-            outfile=self.mock_outfile)
-        scaffold.mock("server.OpenIDStore",
+            tracker=self.mock_tracker)
+        scaffold.mock(
+            "server.OpenIDStore",
             mock_obj=Stub_OpenIDStore,
-            outfile=self.mock_outfile)
-        scaffold.mock("server.ConsumerAuthStore",
+            tracker=self.mock_tracker)
+        scaffold.mock(
+            "server.ConsumerAuthStore",
             mock_obj=Stub_ConsumerAuthStore,
-            outfile=self.mock_outfile)
-        scaffold.mock("server.SessionManager",
+            tracker=self.mock_tracker)
+        scaffold.mock(
+            "server.SessionManager",
             mock_obj=Stub_SessionManager,
-            outfile=self.mock_outfile)
+            tracker=self.mock_tracker)
 
-        scaffold.mock("server.HTTPServer",
+        scaffold.mock(
+            "server.HTTPServer",
             mock_obj=Stub_HTTPServer,
-            outfile=self.mock_outfile)
-        scaffold.mock("server.HTTPRequestHandler",
+            tracker=self.mock_tracker)
+        scaffold.mock(
+            "server.HTTPRequestHandler",
             mock_obj=Stub_HTTPRequestHandler,
-            outfile=self.mock_outfile)
+            tracker=self.mock_tracker)
 
         self.valid_servers = {
             'simple': dict(
@@ -450,7 +470,7 @@ class Test_GracieServer(scaffold.TestCase):
         """ GracieServer should have specified version string """
         params = self.valid_servers['simple']
         scaffold.mock(
-            "server.version", outfile=self.mock_outfile)
+            "server.version", tracker=self.mock_tracker)
         version_test = "1.414.test"
         server.version.version_full = version_test
         instance = self.server_class(**params['args'])
@@ -469,8 +489,8 @@ class Test_GracieServer(scaffold.TestCase):
         args = params['args']
         opts = params['opts']
         server_address = (opts.host, opts.port)
-        scaffold.mock("server.HTTPServer",
-            outfile=self.mock_outfile)
+        scaffold.mock(
+            "server.HTTPServer", tracker=self.mock_tracker)
         expect_mock_output = """\
             Called server.HTTPServer(
                 %(server_address)r,
@@ -493,8 +513,8 @@ class Test_GracieServer(scaffold.TestCase):
         """ OpenIDStore should be created with specified datadir """
         params = self.valid_servers['datadir']
         datadir = params['datadir']
-        scaffold.mock("server.OpenIDStore",
-            outfile=self.mock_outfile)
+        scaffold.mock(
+            "server.OpenIDStore", tracker=self.mock_tracker)
         expect_mock_output = """\
             Called server.OpenIDStore(%(datadir)r)
             """ % vars()

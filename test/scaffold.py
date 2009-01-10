@@ -2,7 +2,7 @@
 
 # test/scaffold.py
 #
-# Copyright © 2007-2008 Ben Finney <ben+python@benfinney.id.au>
+# Copyright © 2007–2009 Ben Finney <ben+python@benfinney.id.au>
 # This is free software; you may copy, modify and/or distribute this work
 # under the terms of the GNU General Public License, version 2 or later.
 # No warranty expressed or implied. See the file LICENSE for details.
@@ -19,8 +19,9 @@ import operator
 import re
 import textwrap
 from StringIO import StringIO
-from minimock import Mock
 from minimock import (
+    Mock,
+    Printer as MockTracker,
     mock,
     restore as mock_restore,
     )
@@ -48,6 +49,7 @@ def suite(module_name):
     suite = loader.loadTestsFromModule(modules[module_name])
     return suite
 
+
 def unittest_main(argv=None):
     """ Mainline function for each unit test module """
 
@@ -116,8 +118,10 @@ def normalise_function_parameters(text):
 
     return normalised_text
 
+
 doctest.NORMALIZE_FUNCTION_PARAMETERS = (
     doctest.register_optionflag('NORMALIZE_FUNCTION_PARAMETERS'))
+
 
 class MinimockOutputChecker(doctest.OutputChecker, object):
     """ Class for matching output of MiniMock objects against expectations """
@@ -143,7 +147,6 @@ class TestCase(unittest.TestCase):
             arguments ``*args`` and ``**kwargs``.
 
             """
-
         try:
             super(TestCase, self).failUnlessRaises(
                 exc_class, func, *args, **kwargs)
@@ -156,7 +159,6 @@ class TestCase(unittest.TestCase):
                 ) % vars()
             raise self.failureException(msg)
 
-
     def failIfIs(self, first, second, msg=None):
         """ Fail if the two objects are identical
 
@@ -164,7 +166,6 @@ class TestCase(unittest.TestCase):
             as determined by the ``is`` operator.
 
             """
-
         if first is second:
             if msg is None:
                 msg = "%(first)r is %(second)r" % vars()
@@ -177,7 +178,6 @@ class TestCase(unittest.TestCase):
             identical, as determined by the ``is`` operator.
 
             """
-
         if first is not second:
             if msg is None:
                 msg = "%(first)r is not %(second)r" % vars()
@@ -193,7 +193,6 @@ class TestCase(unittest.TestCase):
             determined by the ``in`` operator.
 
             """
-
         if second in first:
             if msg is None:
                 msg = "%(second)r is in %(first)r" % vars()
@@ -206,7 +205,6 @@ class TestCase(unittest.TestCase):
             determined by the ``in`` operator.
 
             """
-
         if second not in first:
             if msg is None:
                 msg = "%(second)r is not in %(first)r" % vars()
@@ -252,7 +250,6 @@ class TestCase(unittest.TestCase):
             of ``classes``.
 
             """
-
         if isinstance(obj, classes):
             if msg is None:
                 msg = (
@@ -267,7 +264,6 @@ class TestCase(unittest.TestCase):
             any of ``classes``.
 
             """
-
         if not isinstance(obj, classes):
             if msg is None:
                 msg = (
@@ -285,7 +281,6 @@ class TestCase(unittest.TestCase):
             of the levels in the traceback object ``traceback``.
 
             """
-
         func_in_traceback = False
         expect_code = function.func_code
         current_traceback = traceback
@@ -323,8 +318,7 @@ class Test_Exception(TestCase):
             params['instance'] = instance
 
         self.iterate_params = make_params_iterator(
-            default_params_dict = self.valid_exceptions
-            )
+            default_params_dict = self.valid_exceptions)
 
         super(Test_Exception, self).setUp()
 
@@ -379,11 +373,12 @@ class Test_ProgramMain(TestCase):
     def setUp(self):
         """ Set up test fixtures """
         self.mock_outfile = StringIO()
+        self.mock_tracker = MockTracker(self.mock_outfile)
 
         self.app_class_name = self.application_class.__name__
-        self.mock_app = Mock("test_app", outfile=self.mock_outfile)
+        self.mock_app = Mock("test_app", tracker=self.mock_tracker)
         self.mock_app_class = Mock(self.app_class_name,
-            outfile=self.mock_outfile)
+            tracker=self.mock_tracker)
         self.mock_app_class.mock_returns = self.mock_app
         mock(self.app_class_name, mock_obj=self.mock_app_class,
             nsdicts=[self.program_module.__dict__])
@@ -443,4 +438,3 @@ class Test_ProgramMain(TestCase):
         self.mock_app.main.mock_raises = SystemExit(expect_exit_code)
         exit_code = self.program_module.__main__()
         self.failUnlessEqual(expect_exit_code, exit_code)
-
