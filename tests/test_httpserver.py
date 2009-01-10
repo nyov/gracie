@@ -1,4 +1,3 @@
-#! /usr/bin/python
 # -*- coding: utf-8 -*-
 
 # tests/test_httpserver.py
@@ -146,12 +145,3 @@ class Test_HTTPServer(scaffold.TestCase):
     def test_serve_forever_is_callable(self):
         """ HTTPServer.serve_forever should be callable """
         self.failUnless(callable(self.server_class.serve_forever))
-
-
-suite = scaffold.suite(__name__)
-
-__main__ = scaffold.unittest_main
-
-if __name__ == '__main__':
-    exitcode = __main__(sys.argv)
-    sys.exit(exitcode)

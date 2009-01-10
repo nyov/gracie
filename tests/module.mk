@@ -10,8 +10,6 @@
 
 MODULE_DIR := tests
 
-TEST_SUITE = ${TEST_DIR}/suite.py
-
 GENERATED_FILES += .coverage
 
 PYFLAKES = pyflakes
@@ -39,7 +37,7 @@ endef
 
 test:
 	$(call test-output-banner, "Test run: " )
-	$(PYTHON) ${TEST_SUITE}
+	$(PYTHON_SETUP) test
 
 # usage: $(call test-wait)
 define test-wait
@@ -67,7 +65,7 @@ pylint:
 
 .PHONY: coverage
 coverage:
-	$(COVERAGE) -x ${TEST_SUITE}
+	$(COVERAGE) -x ${PYTHON_SETUP_SCRIPT} test
 	$(COVERAGE) -r -m ${CODE_MODULES} ${CODE_PROGRAMS}
 
 qa: pyflakes coverage

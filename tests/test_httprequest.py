@@ -1,4 +1,3 @@
-#! /usr/bin/python
 # -*- coding: utf-8 -*-
 
 # tests/test_httprequest.py
@@ -989,12 +988,3 @@ class Test_HTTPRequestHandler(scaffold.TestCase):
             self.failUnlessOutputCheckerMatch(
                 expect_stdout, self.stdout_test.getvalue()
                 )
-
-
-suite = scaffold.suite(__name__)
-
-__main__ = scaffold.unittest_main
-
-if __name__ == '__main__':
-    exitcode = __main__(sys.argv)
-    sys.exit(exitcode)

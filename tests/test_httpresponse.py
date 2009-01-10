@@ -1,4 +1,3 @@
-#! /usr/bin/python
 # -*- coding: utf-8 -*-
 
 # tests/test_httpresponse.py
@@ -188,12 +187,3 @@ class Test_Response(scaffold.TestCase):
                 expect_stdout, self.stdout_test.getvalue()
                 )
         sys.stdout = stdout_prev
-
-
-suite = scaffold.suite(__name__)
-
-__main__ = scaffold.unittest_main
-
-if __name__ == '__main__':
-    exitcode = __main__(sys.argv)
-    sys.exit(exitcode)

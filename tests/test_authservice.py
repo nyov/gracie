@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # tests/test_authservice.py
@@ -351,13 +350,3 @@ class Test_PamAuthService(scaffold.TestCase):
         username = credentials['username']
         result = instance.authenticate(credentials)
         self.failUnlessEqual(username, result)
-
-
-suite = scaffold.suite(__name__)
-
-__main__ = scaffold.unittest_main
-
-if __name__ == '__main__':
-    import sys
-    exitcode = __main__(sys.argv)
-    sys.exit(exitcode)

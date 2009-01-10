@@ -1,4 +1,3 @@
-#! /usr/bin/python
 # -*- coding: utf-8 -*-
 
 # tests/test_gracied.py
@@ -314,12 +313,3 @@ class Test_ProgramMain(scaffold.Test_ProgramMain):
         self.program_module = gracied
         self.application_class = gracied.Gracie
         super(Test_ProgramMain, self).setUp()
-
-
-suite = scaffold.suite(__name__)
-
-__main__ = scaffold.unittest_main
-
-if __name__ == '__main__':
-    exitcode = __main__(sys.argv)
-    sys.exit(exitcode)

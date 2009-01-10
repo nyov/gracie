@@ -41,7 +41,7 @@ setup(
 
     # setuptools metadata
     zip_safe = False,
-    test_suite = "tests.suite.suite",
+    test_suite = "tests.suite",
     install_requires = [
         "python-openid >= 1.2",
         "Routes >= 1.6.3",

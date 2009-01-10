@@ -38,15 +38,27 @@ bin_dir = os.path.join(parent_dir, "bin")
 logging.disable(logging.CRITICAL)
 
 
-class Container(object):
-    """ Simple container class for attributes """
+def get_python_module_names(file_list, file_suffix='.py'):
+    """ Return a list of module names from a filename list """
+    module_names = [m[:m.rfind(file_suffix)] for m in file_list
+        if m.endswith(file_suffix)]
+    return module_names
 
-
-def suite(module_name):
-    """ Create the test suite for named module """
-    from sys import modules
+
+def get_test_module_names(module_list, module_prefix='test_'):
+    """ Return the list of module names that qualify as test modules """
+    module_names = [m for m in module_list
+        if m.startswith(module_prefix)]
+    return module_names
+
+
+def make_suite(path=test_dir):
+    """ Create the test suite for the given path """
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromModule(modules[module_name])
+    python_module_names = get_python_module_names(os.listdir(path))
+    test_module_names = get_test_module_names(python_module_names)
+    suite = loader.loadTestsFromNames(test_module_names)
+
     return suite
 
 

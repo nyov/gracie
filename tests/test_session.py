@@ -1,4 +1,3 @@
-#! /usr/bin/python
 # -*- coding: utf-8 -*-
 
 # tests/test_session.py
@@ -103,12 +102,3 @@ class Test_SessionManager(scaffold.TestCase):
             KeyError,
             instance.get_session, session_id
             )
-
-
-suite = scaffold.suite(__name__)
-
-__main__ = scaffold.unittest_main
-
-if __name__ == '__main__':
-    exitcode = __main__(sys.argv)
-    sys.exit(exitcode)

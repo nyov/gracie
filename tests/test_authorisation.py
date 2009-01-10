@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # tests/test_authorisation.py
@@ -68,12 +67,3 @@ class Test_ConsumerAuthStore(scaffold.TestCase):
         instance.remove_authorisation(auth_tuple)
         got_status = instance.is_authorised(auth_tuple)
         self.failUnlessEqual(False, got_status)
-
-
-suite = scaffold.suite(__name__)
-
-__main__ = scaffold.unittest_main
-
-if __name__ == '__main__':
-    exitcode = __main__(sys.argv)
-    sys.exit(exitcode)
