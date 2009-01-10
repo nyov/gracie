@@ -46,6 +46,7 @@ class Test_Gracie(scaffold.TestCase):
         self.app_class = gracied.Gracie
 
         self.mock_outfile = StringIO()
+        self.mock_tracker = scaffold.MockTracker(self.mock_outfile)
 
         self.stdout_prev = sys.stdout
         self.stdout_test = StringIO()
@@ -169,7 +170,7 @@ class Test_Gracie(scaffold.TestCase):
         argv = ["progname", "--version"]
         args = dict(argv=argv)
         scaffold.mock(
-            "gracied.version", outfile=self.mock_outfile)
+            "gracied.version", tracker=self.mock_tracker)
         version_test = "Foo.Boo"
         gracied.version.version_full = version_test
         expect_stdout = """\
