@@ -452,17 +452,13 @@ class Test_GracieServer(scaffold.TestCase):
             params['args'] = args
             params['instance'] = instance
 
-        self.iterate_params = scaffold.make_params_iterator(
-            default_params_dict = self.valid_servers
-            )
-
     def tearDown(self):
         """ Tear down test fixtures """
         scaffold.mock_restore()
 
     def test_instantiate(self):
         """ New GracieServer instance should be created """
-        for key, params in self.iterate_params():
+        for params in self.valid_servers.values():
             instance = params['instance']
             self.failIfIs(None, instance)
 

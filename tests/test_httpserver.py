@@ -102,10 +102,6 @@ class Test_HTTPServer(scaffold.TestCase):
             params['args'] = args
             params['instance'] = instance
 
-        self.iterate_params = scaffold.make_params_iterator(
-            default_params_dict = self.valid_servers
-            )
-
     def tearDown(self):
         """ Tear down test fixtures """
         sys.stdout = self.stdout_prev
@@ -114,7 +110,7 @@ class Test_HTTPServer(scaffold.TestCase):
 
     def test_instantiate(self):
         """ New HTTPServer instance should be created """
-        for key, params in self.iterate_params():
+        for params in self.valid_servers.values():
             instance = params['instance']
             self.failIfIs(None, instance)
 
@@ -131,7 +127,7 @@ class Test_HTTPServer(scaffold.TestCase):
 
     def test_request_handler_class_as_specified(self):
         """ HTTPServer should have specified RequestHandlerClass """
-        for key, params in self.iterate_params():
+        for params in self.valid_servers.values():
             instance = params['instance']
             handler_class = params['handler_class']
             self.failUnlessEqual(
@@ -140,7 +136,7 @@ class Test_HTTPServer(scaffold.TestCase):
 
     def test_gracie_server_as_specified(self):
         """ HTTPServer should have specified Gracie server instance """
-        for key, params in self.iterate_params():
+        for params in self.valid_servers.values():
             instance = params['instance']
             gracie_server = params['gracie_server']
             self.failUnlessEqual(

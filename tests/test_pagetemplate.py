@@ -111,19 +111,15 @@ class Test_Page(
             instance.values.update(values)
             params['instance'] = instance
 
-        self.iterate_params = scaffold.make_params_iterator(
-            default_params_dict = self.valid_pages
-            )
-
     def test_instantiate(self):
         """ New Page instance should be created """
-        for key, params in self.iterate_params():
+        for params in self.valid_pages.values():
             instance = params['instance']
             self.failIfIs(None, instance)
 
     def test_title_as_specified(self):
         """ Page title should be as specified """
-        for key, params in self.iterate_params():
+        for params in self.valid_pages.values():
             title = params.get('title')
             if not title:
                 continue
@@ -132,7 +128,7 @@ class Test_Page(
 
     def test_values_as_specified(self):
         """ Page values should be as specified """
-        for key, params in self.iterate_params():
+        for params in self.valid_pages.values():
             values = params.get('values')
             if not values:
                 continue

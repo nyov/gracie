@@ -78,19 +78,6 @@ def make_module_from_file(module_name, file_name):
     return module
 
 
-def make_params_iterator(default_params_dict):
-    """ Make a function for generating test parameters """
-
-    def iterate_params(params_dict=None):
-        """ Iterate a single test for a set of parameters """
-        if not params_dict:
-            params_dict = default_params_dict
-        for key, params in params_dict.items():
-            yield key, params
-
-    return iterate_params
-
-
 def normalise_function_parameters(text):
     """ Return a version of ``text`` with function parameters normalised
 
@@ -317,20 +304,17 @@ class Test_Exception(TestCase):
             instance = exc_type(*args)
             params['instance'] = instance
 
-        self.iterate_params = make_params_iterator(
-            default_params_dict = self.valid_exceptions)
-
         super(Test_Exception, self).setUp()
 
     def test_exception_instance(self):
         """ Exception instance should be created """
-        for key, params in self.iterate_params():
+        for params in self.valid_exceptions.values():
             instance = params['instance']
             self.failIfIs(None, instance)
 
     def test_exception_types(self):
         """ Exception instances should match expected types """
-        for key, params in self.iterate_params():
+        for params in self.valid_exceptions.values():
             instance = params['instance']
             for match_type in params['types']:
                 match_type_name = match_type.__name__

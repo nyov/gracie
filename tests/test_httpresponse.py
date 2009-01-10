@@ -63,19 +63,15 @@ class Test_ResponseHeader(scaffold.TestCase):
             instance = self.header_class(**args)
             params['instance'] = instance
 
-        self.iterate_params = scaffold.make_params_iterator(
-            default_params_dict = self.valid_headers
-            )
-
     def test_instantiate(self):
         """ New ResponseHeader instance should be created """
-        for key, params in self.iterate_params():
+        for params in self.valid_headers.values():
             instance = params['instance']
             self.failIfIs(None, instance)
 
     def test_code_as_specified(self):
         """ ResponseHeader should have specified status code """
-        for key, params in self.iterate_params():
+        for params in self.valid_headers.values():
             code = params['code']
             instance = params['instance']
             self.failUnlessEqual(code, instance.code)
@@ -89,7 +85,7 @@ class Test_ResponseHeader(scaffold.TestCase):
 
     def test_protocol_as_specified(self):
         """ ResponseHeader should have specified response protocol """
-        for key, params in self.iterate_params():
+        for params in self.valid_headers.values():
             protocol = params.get('protocol')
             if protocol is None:
                 continue
@@ -105,7 +101,7 @@ class Test_ResponseHeader(scaffold.TestCase):
 
     def test_content_type_as_specified(self):
         """ ResponseHeader should have specified Content-Type field """
-        for key, params in self.iterate_params():
+        for params in self.valid_headers.values():
             content_type = params.get('content_type')
             expect_field = ("Content-Type", content_type)
             if content_type is None:
@@ -153,19 +149,15 @@ class Test_Response(scaffold.TestCase):
             instance = self.response_class(**args)
             params['instance'] = instance
 
-        self.iterate_params = scaffold.make_params_iterator(
-            default_params_dict = self.valid_responses
-            )
-
     def test_initialise(self):
         """ New Response instance should be created """
-        for key, params in self.iterate_params():
+        for params in self.valid_responses.values():
             instance = params['instance']
             self.failIfIs(None, instance)
 
     def test_header_as_specified(self):
         """ Response should have specified header """
-        for key, params in self.iterate_params():
+        for params in self.valid_responses.values():
             header = params['header']
             instance = params['instance']
             self.failUnlessEqual(header, instance.header)
@@ -182,7 +174,7 @@ class Test_Response(scaffold.TestCase):
         self.stdout_test = StringIO("")
         stdout_prev = sys.stdout
         sys.stdout = self.stdout_test
-        for key, params in self.iterate_params():
+        for params in self.valid_responses.values():
             instance = params['instance']
             handler = Mock('HTTPRequestHandler')
             instance.send_to_handler(handler)

@@ -113,10 +113,6 @@ class Test_Gracie(scaffold.TestCase):
             instance = self.app_class(**args)
             params['instance'] = instance
 
-        self.iterate_params = scaffold.make_params_iterator(
-            default_params_dict = self.valid_apps
-            )
-
     def tearDown(self):
         """ Tear down test fixtures """
         self.stdout_test.truncate(0)
@@ -128,7 +124,7 @@ class Test_Gracie(scaffold.TestCase):
 
     def test_instantiate(self):
         """ New Gracie instance should be created """
-        for key, params in self.iterate_params():
+        for params in self.valid_apps.values():
             instance = params['instance']
             self.failIfIs(instance, None)
 
@@ -260,7 +256,7 @@ class Test_Gracie(scaffold.TestCase):
 
     def test_main_sets_specified_socket_params(self):
         """ main() should set the server on the specified host:port """
-        for key, params in self.iterate_params():
+        for params in self.valid_apps.values():
             instance = params['instance']
             default_address = (
                 gracied.default_host, gracied.default_port
