@@ -60,9 +60,7 @@ class Test_HTTPServer(scaffold.TestCase):
 
     def setUp(self):
         """ Set up test fixtures """
-
-        self.mock_outfile = StringIO()
-        self.mock_tracker = scaffold.MockTracker(self.mock_outfile)
+        self.mock_tracker = scaffold.MockTracker()
 
         self.server_class = httpserver.HTTPServer
 

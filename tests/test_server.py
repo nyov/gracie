@@ -48,8 +48,7 @@ class Test_create_pid_file(scaffold.TestCase):
 
     def setUp(self):
         """ Set up test fixtures """
-        self.mock_outfile = StringIO()
-        self.mock_tracker = scaffold.MockTracker(self.mock_outfile)
+        self.mock_tracker = scaffold.MockTracker()
 
         self.mock_pidfile = StringIO()
         scaffold.mock(
@@ -70,9 +69,7 @@ class Test_create_pid_file(scaffold.TestCase):
             """ % vars()
         server.create_pid_file(pid)
         scaffold.mock_restore()
-        self.failUnlessOutputCheckerMatch(
-            expect_mock_output, self.mock_outfile.getvalue()
-            )
+        self.failUnlessMockTrackerMatch(expect_mock_output)
 
     def test_writes_pid_to_file(self):
         """ Should write the specified PID in the correct format """
@@ -90,8 +87,7 @@ class Test_remove_pid_file(scaffold.TestCase):
 
     def setUp(self):
         """ Set up test fixtures """
-        self.mock_outfile = StringIO()
-        self.mock_tracker = scaffold.MockTracker(self.mock_outfile)
+        self.mock_tracker = scaffold.MockTracker()
 
         scaffold.mock(
             "os.remove",
@@ -108,9 +104,7 @@ class Test_remove_pid_file(scaffold.TestCase):
             Called os.remove(%(mock_pidfile)r)
             """ % vars()
         server.remove_pid_file()
-        self.failUnlessOutputCheckerMatch(
-            expect_mock_output, self.mock_outfile.getvalue()
-            )
+        self.failUnlessMockTrackerMatch(expect_mock_output)
 
 
 class Test_become_daemon(scaffold.TestCase):
@@ -118,8 +112,7 @@ class Test_become_daemon(scaffold.TestCase):
 
     def setUp(self):
         """ Set up test fixtures """
-        self.mock_outfile = StringIO()
-        self.mock_tracker = scaffold.MockTracker(self.mock_outfile)
+        self.mock_tracker = scaffold.MockTracker()
 
         test_pids = [0, 0]
         scaffold.mock(
@@ -157,9 +150,7 @@ class Test_become_daemon(scaffold.TestCase):
             ...
             """
         server.become_daemon()
-        self.failUnlessOutputCheckerMatch(
-            expect_mock_output, self.mock_outfile.getvalue()
-            )
+        self.failUnlessMockTrackerMatch(expect_mock_output)
 
     def test_child_starts_new_process_group(self):
         """ become_daemon child should start new process group """
@@ -169,9 +160,7 @@ class Test_become_daemon(scaffold.TestCase):
             ...
             """
         server.become_daemon()
-        self.failUnlessOutputCheckerMatch(
-            expect_mock_output, self.mock_outfile.getvalue()
-            )
+        self.failUnlessMockTrackerMatch(expect_mock_output)
 
     def test_child_forks_next_parent_exits(self):
         """ become_daemon should fork, then exit if parent """
@@ -187,9 +176,7 @@ class Test_become_daemon(scaffold.TestCase):
             ...
             """
         server.become_daemon()
-        self.failUnlessOutputCheckerMatch(
-            expect_mock_output, self.mock_outfile.getvalue()
-            )
+        self.failUnlessMockTrackerMatch(expect_mock_output)
 
     def test_child_forks_next_child_continues(self):
         """ become_daemon should fork, then continue if child """
@@ -201,9 +188,7 @@ class Test_become_daemon(scaffold.TestCase):
             ...
             """
         server.become_daemon()
-        self.failUnlessOutputCheckerMatch(
-            expect_mock_output, self.mock_outfile.getvalue()
-            )
+        self.failUnlessMockTrackerMatch(expect_mock_output)
 
     def test_creates_pid_file_with_own_pid(self):
         """ Should request creation of a PID file with its own PID """
@@ -218,9 +203,7 @@ class Test_become_daemon(scaffold.TestCase):
             ...
             """ % vars()
         server.become_daemon()
-        self.failUnlessOutputCheckerMatch(
-            expect_mock_output, self.mock_outfile.getvalue()
-            )
+        self.failUnlessMockTrackerMatch(expect_mock_output)
 
     def test_removes_standard_files(self):
         """ become_daemon should request removal of standard files """
@@ -229,9 +212,7 @@ class Test_become_daemon(scaffold.TestCase):
             Called server.remove_standard_files()
             """
         server.become_daemon()
-        self.failUnlessOutputCheckerMatch(
-            expect_mock_output, self.mock_outfile.getvalue()
-            )
+        self.failUnlessMockTrackerMatch(expect_mock_output)
 
 
 def stub_server_bind(server):
@@ -388,8 +369,7 @@ class Test_GracieServer(scaffold.TestCase):
 
     def setUp(self):
         """ Set up test fixtures """
-        self.mock_outfile = StringIO()
-        self.mock_tracker = scaffold.MockTracker(self.mock_outfile)
+        self.mock_tracker = scaffold.MockTracker()
 
         self.server_class = server.GracieServer
 
@@ -493,9 +473,7 @@ class Test_GracieServer(scaffold.TestCase):
                 <gracie.server.GracieServer object ...>)
             """ % vars()
         instance = self.server_class(**params['args'])
-        self.failUnlessOutputCheckerMatch(
-            expect_mock_output, self.mock_outfile.getvalue()
-            )
+        self.failUnlessMockTrackerMatch(expect_mock_output)
 
     def test_server_has_openid_server(self):
         """ GracieServer should have an openid_server attribute """
@@ -514,9 +492,7 @@ class Test_GracieServer(scaffold.TestCase):
             Called server.OpenIDStore(%(datadir)r)
             """ % vars()
         instance = self.server_class(**params['args'])
-        self.failUnlessOutputCheckerMatch(
-            expect_mock_output, self.mock_outfile.getvalue()
-            )
+        self.failUnlessMockTrackerMatch(expect_mock_output)
 
     def test_server_has_auth_service(self):
         """ GracieServer should have an auth_service attribute """

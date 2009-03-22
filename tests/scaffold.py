@@ -21,7 +21,7 @@ import textwrap
 from StringIO import StringIO
 from minimock import (
     Mock,
-    Printer as MockTracker,
+    TraceTracker as MockTracker,
     mock,
     restore as mock_restore,
     )
@@ -242,6 +242,28 @@ class TestCase(unittest.TestCase):
 
     assertOutputCheckerMatch = failUnlessOutputCheckerMatch
 
+    def failUnlessMockTrackerMatch(self, want, tracker=None, msg=None):
+        """ Fail unless the mock tracker matches the wanted output.
+
+            Fail the test unless ``want`` matches the output tracked
+            by the mock tracker ``tracker``. This is not an equality
+            check, but a pattern match according to the
+            ``doctest.OutputChecker`` rules.
+
+            """
+        if tracker is None:
+            tracker = self.mock_tracker
+        if not tracker.check(want):
+            if msg is None:
+                diff = tracker.diff(want)
+                msg = "\n".join([
+                    "Output received did not match expected output",
+                    "%(diff)s",
+                    ]) % vars()
+            raise self.failureException(msg)
+
+    assertMockTrackerMatch = failUnlessMockTrackerMatch
+
     def failIfIsInstance(self, obj, classes, msg=None):
         """ Fail if the object is an instance of the specified classes
 
@@ -368,8 +390,7 @@ class Test_ProgramMain(TestCase):
 
     def setUp(self):
         """ Set up test fixtures """
-        self.mock_outfile = StringIO()
-        self.mock_tracker = MockTracker(self.mock_outfile)
+        self.mock_tracker = MockTracker()
 
         self.app_class_name = self.application_class.__name__
         self.mock_app = Mock("test_app", tracker=self.mock_tracker)
@@ -394,8 +415,7 @@ class Test_ProgramMain(TestCase):
             Called %(app_class_name)s(%(argv)r)...
             """ % vars()
         self.program_module.__main__(argv)
-        self.failUnlessOutputCheckerMatch(
-            expect_mock_output, self.mock_outfile.getvalue())
+        self.failUnlessMockTrackerMatch(expect_mock_output)
 
     def test_main_should_call_app_main(self):
         """ __main__() should call the application main method """
@@ -406,8 +426,7 @@ class Test_ProgramMain(TestCase):
             Called test_app.main()
             """ % vars()
         self.program_module.__main__(argv)
-        self.failUnlessOutputCheckerMatch(
-            expect_mock_output, self.mock_outfile.getvalue())
+        self.failUnlessMockTrackerMatch(expect_mock_output)
 
     def test_main_no_argv_should_supply_sys_argv(self):
         """ __main__() with no argv should supply sys.argv to application """
@@ -419,8 +438,7 @@ class Test_ProgramMain(TestCase):
             Called test_app.main()
             """ % vars()
         self.program_module.__main__()
-        self.failUnlessOutputCheckerMatch(
-            expect_mock_output, self.mock_outfile.getvalue())
+        self.failUnlessMockTrackerMatch(expect_mock_output)
 
     def test_main_should_return_none_on_success(self):
         """ __main__() should return None when no SystemExit raised """
