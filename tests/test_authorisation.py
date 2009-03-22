@@ -1,10 +1,9 @@
-#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# test/test_authorisation.py
+# tests/test_authorisation.py
 # Part of Gracie, an OpenID provider
 #
-# Copyright © 2007-2008 Ben Finney <ben+python@benfinney.id.au>
+# Copyright © 2007–2009 Ben Finney <ben+python@benfinney.id.au>
 # This is free software; you may copy, modify and/or distribute this work
 # under the terms of the GNU General Public License, version 2 or later.
 # No warranty expressed or implied. See the file LICENSE for details.
@@ -68,12 +67,3 @@ class Test_ConsumerAuthStore(scaffold.TestCase):
         instance.remove_authorisation(auth_tuple)
         got_status = instance.is_authorised(auth_tuple)
         self.failUnlessEqual(False, got_status)
-
-
-suite = scaffold.suite(__name__)
-
-__main__ = scaffold.unittest_main
-
-if __name__ == '__main__':
-    exitcode = __main__(sys.argv)
-    sys.exit(exitcode)

@@ -1,10 +1,9 @@
-#! /usr/bin/python
 # -*- coding: utf-8 -*-
 
-# test/test_httprequest.py
+# tests/test_httprequest.py
 # Part of Gracie, an OpenID provider
 #
-# Copyright © 2007-2008 Ben Finney <ben@benfinney.id.au>
+# Copyright © 2007–2009 Ben Finney <ben+python@benfinney.id.au>
 # This is free software; you may copy, modify and/or distribute this work
 # under the terms of the GNU General Public License, version 2 or later.
 # No warranty expressed or implied. See the file LICENSE for details.
@@ -501,10 +500,6 @@ class Test_HTTPRequestHandler(scaffold.TestCase):
                     )
             params['args'] = args
 
-        self.iterate_params = scaffold.make_params_iterator(
-            default_params_dict = self.valid_requests
-            )
-
         version = Stub_GracieServer.version
         self.expect_server_version = "Gracie/%(version)s" % vars()
         python_version = sys.version.split()[0]
@@ -554,20 +549,20 @@ class Test_HTTPRequestHandler(scaffold.TestCase):
 
     def test_instantiate(self):
         """ New HTTPRequestHandler instance should be created """
-        for key, params in self.iterate_params():
+        for params in self.valid_requests.values():
             instance = self.handler_class(**params['args'])
             self.failIfIs(None, instance)
 
     def test_server_as_specified(self):
         """ HTTPRequestHandler should have specified server attribute """
-        for key, params in self.iterate_params():
+        for params in self.valid_requests.values():
             instance = self.handler_class(**params['args'])
             server = params['server']
             self.failUnlessEqual(server, instance.server)
 
     def test_server_version_as_specified(self):
         """ HTTPRequestHandler should report module version """
-        for key, params in self.iterate_params():
+        for params in self.valid_requests.values():
             instance = self.handler_class(**params['args'])
             self.failUnlessEqual(
                 self.expect_server_version, instance.server_version
@@ -587,14 +582,14 @@ class Test_HTTPRequestHandler(scaffold.TestCase):
 
     def test_command_from_request(self):
         """ Request command attribute should come from request text """
-        for key, params in self.iterate_params():
+        for params in self.valid_requests.values():
             request = params['request']
             instance = self.handler_class(**params['args'])
             self.failUnlessEqual(request.method, instance.command)
 
     def test_path_from_request(self):
         """ Request path attribute should come from request text """
-        for key, params in self.iterate_params():
+        for params in self.valid_requests.values():
             request = params['request']
             instance = self.handler_class(**params['args'])
             self.failUnlessEqual(request.path, instance.path)
@@ -993,12 +988,3 @@ class Test_HTTPRequestHandler(scaffold.TestCase):
             self.failUnlessOutputCheckerMatch(
                 expect_stdout, self.stdout_test.getvalue()
                 )
-
-
-suite = scaffold.suite(__name__)
-
-__main__ = scaffold.unittest_main
-
-if __name__ == '__main__':
-    exitcode = __main__(sys.argv)
-    sys.exit(exitcode)

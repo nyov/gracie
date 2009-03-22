@@ -17,7 +17,7 @@ PATH = /usr/bin:/bin
 CODE_PACKAGE_DIRS := gracie
 CODE_PROGRAM_DIR := bin
 DOC_DIR := doc
-TEST_DIR := test
+TEST_DIR := tests
 
 # Variables that will be extended by module include files
 GENERATED_FILES :=

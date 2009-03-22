@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# test/scaffold.py
+# tests/scaffold.py
 #
 # Copyright © 2007–2009 Ben Finney <ben+python@benfinney.id.au>
 # This is free software; you may copy, modify and/or distribute this work
@@ -38,15 +38,27 @@ bin_dir = os.path.join(parent_dir, "bin")
 logging.disable(logging.CRITICAL)
 
 
-class Container(object):
-    """ Simple container class for attributes """
+def get_python_module_names(file_list, file_suffix='.py'):
+    """ Return a list of module names from a filename list """
+    module_names = [m[:m.rfind(file_suffix)] for m in file_list
+        if m.endswith(file_suffix)]
+    return module_names
 
-
-def suite(module_name):
-    """ Create the test suite for named module """
-    from sys import modules
+
+def get_test_module_names(module_list, module_prefix='test_'):
+    """ Return the list of module names that qualify as test modules """
+    module_names = [m for m in module_list
+        if m.startswith(module_prefix)]
+    return module_names
+
+
+def make_suite(path=test_dir):
+    """ Create the test suite for the given path """
     loader = unittest.TestLoader()
-    suite = loader.loadTestsFromModule(modules[module_name])
+    python_module_names = get_python_module_names(os.listdir(path))
+    test_module_names = get_test_module_names(python_module_names)
+    suite = loader.loadTestsFromNames(test_module_names)
+
     return suite
 
 
@@ -76,19 +88,6 @@ def make_module_from_file(module_name, file_name):
     exec module_file in module.__dict__
 
     return module
-
-
-def make_params_iterator(default_params_dict):
-    """ Make a function for generating test parameters """
-
-    def iterate_params(params_dict=None):
-        """ Iterate a single test for a set of parameters """
-        if not params_dict:
-            params_dict = default_params_dict
-        for key, params in params_dict.items():
-            yield key, params
-
-    return iterate_params
 
 
 def normalise_function_parameters(text):
@@ -317,20 +316,17 @@ class Test_Exception(TestCase):
             instance = exc_type(*args)
             params['instance'] = instance
 
-        self.iterate_params = make_params_iterator(
-            default_params_dict = self.valid_exceptions)
-
         super(Test_Exception, self).setUp()
 
     def test_exception_instance(self):
         """ Exception instance should be created """
-        for key, params in self.iterate_params():
+        for params in self.valid_exceptions.values():
             instance = params['instance']
             self.failIfIs(None, instance)
 
     def test_exception_types(self):
         """ Exception instances should match expected types """
-        for key, params in self.iterate_params():
+        for params in self.valid_exceptions.values():
             instance = params['instance']
             for match_type in params['types']:
                 match_type_name = match_type.__name__

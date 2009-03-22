@@ -1,16 +1,14 @@
-# test/module.mk
+# tests/module.mk
 # Part of Gracie, an OpenID provider
 #
-# Copyright © 2007-2008 Ben Finney <ben+python@benfinney.id.au>
+# Copyright © 2007–2009 Ben Finney <ben+python@benfinney.id.au>
 # This is free software; you may copy, modify and/or distribute this work
 # under the terms of the GNU General Public License, version 2 or later.
 # No warranty expressed or implied. See the file LICENSE for details.
 
 # Makefile module for test suite
 
-MODULE_DIR := test
-
-TEST_SUITE = ${TEST_DIR}/suite.py
+MODULE_DIR := tests
 
 GENERATED_FILES += .coverage
 
@@ -39,7 +37,7 @@ endef
 
 test:
 	$(call test-output-banner, "Test run: " )
-	$(PYTHON) ${TEST_SUITE}
+	$(PYTHON_SETUP) test
 
 # usage: $(call test-wait)
 define test-wait
@@ -67,7 +65,7 @@ pylint:
 
 .PHONY: coverage
 coverage:
-	$(COVERAGE) -x ${TEST_SUITE}
+	$(COVERAGE) -x ${PYTHON_SETUP_SCRIPT} test
 	$(COVERAGE) -r -m ${CODE_MODULES} ${CODE_PROGRAMS}
 
 qa: pyflakes coverage

@@ -2,7 +2,7 @@
 Developer's guide
 =================
 
-:Updated: bignose 2007-03-26
+:Updated: bignose 2009-01-10
 
 Project layout
 ==============
@@ -14,7 +14,7 @@ Project layout
         src/            Program source code
             gracied     Main program daemon
             gracie/     Gracie library code
-            test/       Unit tests
+            tests/      Unit tests
 
 Code style
 ==========
@@ -150,4 +150,3 @@ Test-driven development is not absolutely necessary, but is the
 simplest, most direct way to generate the kind of program changes
 accompanied by unit tests that are necessary for inclusion in the
 project.
-

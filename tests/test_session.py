@@ -1,10 +1,9 @@
-#! /usr/bin/python
 # -*- coding: utf-8 -*-
 
-# test/test_session.py
+# tests/test_session.py
 # Part of Gracie, an OpenID provider
 #
-# Copyright © 2007-2008 Ben Finney <ben+python@benfinney.id.au>
+# Copyright © 2007–2009 Ben Finney <ben+python@benfinney.id.au>
 # This is free software; you may copy, modify and/or distribute this work
 # under the terms of the GNU General Public License, version 2 or later.
 # No warranty expressed or implied. See the file LICENSE for details.
@@ -103,12 +102,3 @@ class Test_SessionManager(scaffold.TestCase):
             KeyError,
             instance.get_session, session_id
             )
-
-
-suite = scaffold.suite(__name__)
-
-__main__ = scaffold.unittest_main
-
-if __name__ == '__main__':
-    exitcode = __main__(sys.argv)
-    sys.exit(exitcode)

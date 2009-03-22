@@ -1,8 +1,6 @@
-# :vim: filetype=make : -*- mode: makefile; coding: utf-8; -*-
-
 # setuptools.mk
 #
-# Copyright © 2006-2008 Ben Finney <ben+python@benfinney.id.au>
+# Copyright © 2006–2009 Ben Finney <ben+python@benfinney.id.au>
 # This is free software; you may copy, modify and/or distribute this work
 # under the terms of the GNU General Public License, version 2 or later.
 # No warranty expressed or implied. See the file LICENSE for details.
@@ -11,7 +9,8 @@
 
 MODULE_DIR := .
 
-PREFIX ?= /usr/local
+DESTDIR ?=
+PREFIX ?= /usr
 
 PYVERS := 2.4 2.5
 PYTHON := python
@@ -51,7 +50,7 @@ setuptools-build:
 
 .PHONY: setuptools-install
 setuptools-install:
-	$(PYTHON_SETUP) install --prefix=${PREFIX}
+	$(PYTHON_SETUP) install --root=${DESTDIR} --prefix=${PREFIX}
 
 
 .PHONY: setuptools-dist-upload

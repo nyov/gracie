@@ -1,10 +1,9 @@
-#! /usr/bin/python
 # -*- coding: utf-8 -*-
 
-# test/test_server.py
+# tests/test_server.py
 # Part of Gracie, an OpenID provider
 #
-# Copyright © 2007-2008 Ben Finney <ben+python@benfinney.id.au>
+# Copyright © 2007–2009 Ben Finney <ben+python@benfinney.id.au>
 # This is free software; you may copy, modify and/or distribute this work
 # under the terms of the GNU General Public License, version 2 or later.
 # No warranty expressed or implied. See the file LICENSE for details.
@@ -452,17 +451,13 @@ class Test_GracieServer(scaffold.TestCase):
             params['args'] = args
             params['instance'] = instance
 
-        self.iterate_params = scaffold.make_params_iterator(
-            default_params_dict = self.valid_servers
-            )
-
     def tearDown(self):
         """ Tear down test fixtures """
         scaffold.mock_restore()
 
     def test_instantiate(self):
         """ New GracieServer instance should be created """
-        for key, params in self.iterate_params():
+        for params in self.valid_servers.values():
             instance = params['instance']
             self.failIfIs(None, instance)
 
@@ -547,12 +542,3 @@ class Test_GracieServer(scaffold.TestCase):
     def test_serve_forever_is_callable(self):
         """ GracieServer.serve_forever should be callable """
         self.failUnless(callable(self.server_class.serve_forever))
-
-
-suite = scaffold.suite(__name__)
-
-__main__ = scaffold.unittest_main
-
-if __name__ == '__main__':
-    exitcode = __main__(sys.argv)
-    sys.exit(exitcode)

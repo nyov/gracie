@@ -1,10 +1,9 @@
-#! /usr/bin/python
 # -*- coding: utf-8 -*-
 
-# test/test_gracied.py
+# tests/test_gracied.py
 # Part of Gracie, an OpenID provider
 #
-# Copyright © 2007-2008 Ben Finney <ben+python@benfinney.id.au>
+# Copyright © 2007–2009 Ben Finney <ben+python@benfinney.id.au>
 # This is free software; you may copy, modify and/or distribute this work
 # under the terms of the GNU General Public License, version 2 or later.
 # No warranty expressed or implied. See the file LICENSE for details.
@@ -113,10 +112,6 @@ class Test_Gracie(scaffold.TestCase):
             instance = self.app_class(**args)
             params['instance'] = instance
 
-        self.iterate_params = scaffold.make_params_iterator(
-            default_params_dict = self.valid_apps
-            )
-
     def tearDown(self):
         """ Tear down test fixtures """
         self.stdout_test.truncate(0)
@@ -128,7 +123,7 @@ class Test_Gracie(scaffold.TestCase):
 
     def test_instantiate(self):
         """ New Gracie instance should be created """
-        for key, params in self.iterate_params():
+        for params in self.valid_apps.values():
             instance = params['instance']
             self.failIfIs(instance, None)
 
@@ -260,7 +255,7 @@ class Test_Gracie(scaffold.TestCase):
 
     def test_main_sets_specified_socket_params(self):
         """ main() should set the server on the specified host:port """
-        for key, params in self.iterate_params():
+        for params in self.valid_apps.values():
             instance = params['instance']
             default_address = (
                 gracied.default_host, gracied.default_port
@@ -318,12 +313,3 @@ class Test_ProgramMain(scaffold.Test_ProgramMain):
         self.program_module = gracied
         self.application_class = gracied.Gracie
         super(Test_ProgramMain, self).setUp()
-
-
-suite = scaffold.suite(__name__)
-
-__main__ = scaffold.unittest_main
-
-if __name__ == '__main__':
-    exitcode = __main__(sys.argv)
-    sys.exit(exitcode)
