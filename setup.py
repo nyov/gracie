@@ -46,6 +46,9 @@ setup(
         "python-openid >= 1.2",
         "Routes >= 1.6.3",
         ],
+    tests_require = [
+        "MiniMock >= 1.2.1",
+        ],
 
     # PyPI metadata
     author = version.author_name,
