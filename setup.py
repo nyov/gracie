@@ -47,7 +47,7 @@ setup(
         "Routes >= 1.6.3",
         ],
     tests_require = [
-        "MiniMock >= 1.2.1",
+        "MiniMock >= 1.2.2",
         ],
 
     # PyPI metadata
