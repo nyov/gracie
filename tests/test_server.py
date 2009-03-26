@@ -28,8 +28,7 @@ class Test_remove_standard_files(scaffold.TestCase):
 
     def setUp(self):
         """ Set up test fixtures """
-        self.mock_outfile = StringIO()
-        self.mock_tracker = scaffold.MockTracker(self.mock_outfile)
+        self.mock_tracker = scaffold.MockTracker()
 
         scaffold.mock(
             "sys.stdin", tracker=self.mock_tracker)
