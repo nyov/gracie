@@ -90,51 +90,6 @@ def make_module_from_file(module_name, file_name):
     return module
 
 
-def normalise_function_parameters(text):
-    """ Return a version of ``text`` with function parameters normalised
-
-        The normalisations performed are:
-
-        * Remove any whitespace sequence between an opening
-          parenthesis '(' and a subsequent non-whitespace character.
-
-        * Remove any whitespace sequence between a non-whitespace
-          character and a closing parenthesis ')'.
-
-        * Ensure a comma ',' and a subsequent non-whitespace character
-          are separated by a single space ' '.
-
-        """
-    normalised_text = text
-    normalise_map = {
-        re.compile(r"\(\s+(\S)"): r"(\1",
-        re.compile(r"(\S)\s+\)"): r"\1)",
-        re.compile(r",\s*(\S)"): r", \1",
-        }
-    for search_pattern, replace_pattern in normalise_map.items():
-        normalised_text = re.sub(
-            search_pattern, replace_pattern, normalised_text)
-
-    return normalised_text
-
-
-doctest.NORMALIZE_FUNCTION_PARAMETERS = (
-    doctest.register_optionflag('NORMALIZE_FUNCTION_PARAMETERS'))
-
-
-class MinimockOutputChecker(doctest.OutputChecker, object):
-    """ Class for matching output of MiniMock objects against expectations """
-
-    def check_output(self, want, got, optionflags):
-        if (optionflags & doctest.NORMALIZE_FUNCTION_PARAMETERS):
-            want = normalise_function_parameters(want)
-            got = normalise_function_parameters(got)
-        output_match = super(MinimockOutputChecker, self).check_output(
-            want, got, optionflags)
-        return output_match
-    check_output.__doc__ = doctest.OutputChecker.check_output.__doc__
-
-
 class TestCase(unittest.TestCase):
     """ Test case behaviour """
 
@@ -213,22 +168,21 @@ class TestCase(unittest.TestCase):
     assertNotIn = failIfIn
 
     def failUnlessOutputCheckerMatch(self, want, got, msg=None):
-        """ Fail unless the specified string matches the expected
+        """ Fail unless the specified string matches the expected.
 
             Fail the test unless ``want`` matches ``got``, as
-            determined by a ``MinimockOutputChecker`` instance. This
+            determined by a ``doctest.OutputChecker`` instance. This
             is not an equality check, but a pattern match according to
-            the MinimockOutputChecker rules.
+            the ``OutputChecker`` rules.
 
             """
-        checker = MinimockOutputChecker()
+        checker = doctest.OutputChecker()
         want = textwrap.dedent(want)
         source = ""
         example = doctest.Example(source, want)
         got = textwrap.dedent(got)
         checker_optionflags = reduce(operator.or_, [
             doctest.ELLIPSIS,
-            doctest.NORMALIZE_FUNCTION_PARAMETERS,
             ])
         if not checker.check_output(want, got, checker_optionflags):
             if msg is None:
@@ -248,7 +202,7 @@ class TestCase(unittest.TestCase):
             Fail the test unless ``want`` matches the output tracked
             by the mock tracker ``tracker``. This is not an equality
             check, but a pattern match according to the
-            ``doctest.OutputChecker`` rules.
+            ``minimock.MinimockOutputChecker`` rules.
 
             """
         if tracker is None:
