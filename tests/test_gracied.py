@@ -50,7 +50,8 @@ class Test_Gracie(scaffold.TestCase):
 
         scaffold.mock(
             "gracied.OptionParser.error",
-            raises=SystemExit)
+            raises=SystemExit,
+            tracker=self.mock_tracker)
 
         scaffold.mock(
             "gracied.GracieServer",
@@ -138,21 +139,20 @@ class Test_Gracie(scaffold.TestCase):
 
     def test_wrong_arguments_invokes_parser_error(self):
         """ Wrong number of cmdline arguments should invoke parser error """
-        gracied.OptionParser.error = Mock(
-            "OptionParser.error",
-            )
         invalid_argv_params = [
             ["progname", "foo",]
             ]
+        expect_error = gracied.OptionParser.error.mock_raises
         expect_mock_output = """\
-            Called OptionParser.error("...")
+            Called gracied.OptionParser.error("...")
             """
         for argv in invalid_argv_params:
             args = dict(argv=argv)
-            instance = self.app_class(**args)
-            self.failUnlessOutputCheckerMatch(
-                expect_mock_output, self.stdout_test.getvalue()
-                )
+            try:
+                instance = self.app_class(**args)
+            except expect_error:
+                pass
+            self.failUnlessMockTrackerMatch(expect_mock_output)
 
     def test_opts_version_performs_version_action(self):
         """ Gracie instance should perform version action """
