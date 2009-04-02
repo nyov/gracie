@@ -1,21 +1,26 @@
-% GRACIED(8) Gracie user manual
-% Ben Finney <ben+debian@benfinney.id.au>
-% 2008-09-23
+=======
+gracied
+=======
 
-Name
-####
+------------------------------------
+local-authentication OpenID provider
+------------------------------------
 
-|command| – local-authentication OpenID server
+:Author: |author|
+:Date: 2009-04-02
+:Copyright: GNU General Public License, version 2 or later
+:Manual section: 8
+:Manual group: Gracie OpenID provider
 
-..  |command| gracied
+..  |command| replace:: gracied
 
-Synopsis
-########
+SYNOPSIS
+========
 
 |command| --data-dir `DIR` --host `HOST` --port `PORT` --log-level `LEVEL`
 
-Description
-###########
+DESCRIPTION
+===========
 
 This manual page documents briefly the |command| command.
 
@@ -23,13 +28,13 @@ This manual page documents briefly the |command| command.
 service for local system users, and allows those users to authenticate
 against the local PAM system via a web interface.
 
-Options
-#######
+OPTIONS
+=======
 
--h  --help
+--help, -h
     Show summary of options.
 
--v  --version
+--version, -v
     Show version of program.
 
 --data-dir `DIR`
@@ -48,25 +53,20 @@ Options
     Set the log message threshold to `LEVEL`.
     Default: WARN.
 
-See also
-########
+SEE ALSO
+========
 
 The OpenID project page <http://openid.net/>_.
 
-Author
-######
+HISTORY
+=======
 
-This manual page was written by |authorname| |authoremail| for the
-Debian system (but may be used by others). Permission is granted to
-copy, distribute and/or modify this document under the terms of the
-GNU General Public License, Version 2 or any later version published
-by the Free Software Foundation.
+This manual page was written by |author| for the Debian system (but
+may be used by others).
 
-On Debian systems, the complete text of the GNU General Public License
-can be found in /usr/share/common-licenses/GPL.
-
-..  |authorname| Ben Finney
-..  |authoremail| <ben+debian@benfinney.id.au>
+..  |author| replace:: |authorname| |authoremail|
+..  |authorname| replace:: Ben Finney
+..  |authoremail| replace:: <ben+debian@benfinney.id.au>
 
 ..
     Local variables:

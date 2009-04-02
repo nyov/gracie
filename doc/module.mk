@@ -38,7 +38,7 @@ GENERATED_FILES += ${manpage_files}
 RST2HTML = rst2html
 RST2HTML_OPTS =
 
-PANDOC = pandoc
+RST2MAN = rst2man
 
 CONVERT = convert
 
@@ -52,17 +52,11 @@ build: doc
 .PHONY: man
 man: ${manpage_files}
 
-%.1: %.1.sgml
-	docbook-to-man $< > $@
-
-%.8: %.8.sgml
-	docbook-to-man $< > $@
-
 %.1: %.1${RST_SUFFIX}
-	$(PANDOC) --from rst --to man $< > $@
+	$(RST2MAN) < $< > $@
 
 %.8: %.8${RST_SUFFIX}
-	$(PANDOC) --from rst --to man $< > $@
+	$(RST2MAN) < $< > $@
 
 
 .PHONY: xhtml
