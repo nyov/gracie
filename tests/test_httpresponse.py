@@ -183,4 +183,4 @@ class Response_TestCase(scaffold.TestCase):
                 Called HTTPRequestHandler.wfile.write(...)
                 Called HTTPRequestHandler.wfile.close()
                 """
-            self.failUnlessMockTrackerMatch(expect_mock_output)
+            self.failUnlessMockCheckerMatch(expect_mock_output)

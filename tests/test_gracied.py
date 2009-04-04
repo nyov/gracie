@@ -135,7 +135,7 @@ class Gracie_TestCase(scaffold.TestCase):
            """
         instance = self.app_class(**args)
         gracied.logging = logging_prev
-        self.failUnlessMockTrackerMatch(expect_mock_output)
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_wrong_arguments_invokes_parser_error(self):
         """ Wrong number of cmdline arguments should invoke parser error """
@@ -152,7 +152,7 @@ class Gracie_TestCase(scaffold.TestCase):
                 instance = self.app_class(**args)
             except expect_error:
                 pass
-            self.failUnlessMockTrackerMatch(expect_mock_output)
+            self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_opts_version_performs_version_action(self):
         """ Gracie instance should perform version action """
@@ -240,7 +240,7 @@ class Gracie_TestCase(scaffold.TestCase):
                 <Values at ...: {...}>)
             ...""" % vars()
         instance.main()
-        self.failUnlessMockTrackerMatch(expect_mock_output)
+        self.failUnlessMockCheckerMatch(expect_mock_output)
         self.failIfIs(instance.server, None)
 
     def test_main_sets_specified_socket_params(self):
@@ -260,7 +260,7 @@ class Gracie_TestCase(scaffold.TestCase):
                     <Values at ...: {...}>)
                 ...""" % vars()
             instance.main()
-            self.failUnlessMockTrackerMatch(expect_mock_output)
+            self.failUnlessMockCheckerMatch(expect_mock_output)
             self.mock_tracker.clear()
 
     def test_main_calls_become_daemon(self):
@@ -273,7 +273,7 @@ class Gracie_TestCase(scaffold.TestCase):
             ...
             """
         instance.main()
-        self.failUnlessMockTrackerMatch(expect_mock_output)
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_main_starts_server(self):
         """ main() should start GracieServer if child fork """
@@ -285,7 +285,7 @@ class Gracie_TestCase(scaffold.TestCase):
             Called gracied.GracieServer.serve_forever()
             """
         instance.main()
-        self.failUnlessMockTrackerMatch(expect_mock_output)
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
 
 class ProgramMain_TestCase(scaffold.ProgramMain_TestCase):

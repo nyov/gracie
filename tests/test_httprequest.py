@@ -622,7 +622,7 @@ class HTTPRequestHandler_TestCase(scaffold.TestCase):
             ...
             Called httprequest.Response.send_to_handler(...)
             """
-        self.failUnlessMockTrackerMatch(expect_mock_output)
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_request_with_no_cookie_response_creates_session(self):
         """ With no session cookie, response should create new session """
@@ -635,7 +635,7 @@ class HTTPRequestHandler_TestCase(scaffold.TestCase):
                 ('Set-Cookie', 'TEST_session=DEADBEEF'))
             Called httprequest.Response.send_to_handler(...)
             """
-        self.failUnlessMockTrackerMatch(expect_mock_output)
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_request_with_unknown_cookie_creates_new_session(self):
         """ With unknown username, response should create new session """
@@ -648,7 +648,7 @@ class HTTPRequestHandler_TestCase(scaffold.TestCase):
                 ('Set-Cookie', 'TEST_session=DEADBEEF'))
             Called httprequest.Response.send_to_handler(...)
             """
-        self.failUnlessMockTrackerMatch(expect_mock_output)
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_request_with_good_cookie_response_logged_in(self):
         """ With good session cookie, response should send Logged In """
@@ -662,7 +662,7 @@ class HTTPRequestHandler_TestCase(scaffold.TestCase):
                 ('Set-Cookie', 'TEST_session=DEADBEEF-%(identity_name)s'))
             Called httprequest.Response.send_to_handler(...)
             """ % vars()
-        self.failUnlessMockTrackerMatch(expect_mock_output)
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_get_root_sends_ok_response(self):
         """ Request to GET root document should send OK response """
@@ -673,7 +673,7 @@ class HTTPRequestHandler_TestCase(scaffold.TestCase):
             ...
             Called httprequest.Response.send_to_handler(...)
             """
-        self.failUnlessMockTrackerMatch(expect_mock_output)
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_get_bogus_url_sends_not_found_response(self):
         """ Request to GET unknown URL should send Not Found response """
@@ -685,7 +685,7 @@ class HTTPRequestHandler_TestCase(scaffold.TestCase):
             ...
             Called httprequest.Response.send_to_handler(...)
             """ % vars()
-        self.failUnlessMockTrackerMatch(expect_mock_output)
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_get_bogus_identity_sends_not_found_response(self):
         """ Request to GET unknown user should send Not Found response """
@@ -698,7 +698,7 @@ class HTTPRequestHandler_TestCase(scaffold.TestCase):
             ...
             Called httprequest.Response.send_to_handler(...)
             """ % vars()
-        self.failUnlessMockTrackerMatch(expect_mock_output)
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_get_known_identity_sends_view_user_response(self):
         """ Request to GET known user should send view user response """
@@ -711,7 +711,7 @@ class HTTPRequestHandler_TestCase(scaffold.TestCase):
             ...
             Called httprequest.Response.send_to_handler(...)
             """ % vars()
-        self.failUnlessMockTrackerMatch(expect_mock_output)
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def get_logout_creates_new_session_and_redirects(self):
         """ Request to logout should create new session and logout """
@@ -724,7 +724,7 @@ class HTTPRequestHandler_TestCase(scaffold.TestCase):
                 ('Set-Cookie', 'TEST_session=DEADBEEF'))
             Called httprequest.Response.send_to_handler(...)
             """
-        self.failUnlessMockTrackerMatch(expect_mock_output)
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_get_login_sends_login_form_response(self):
         """ Request to GET login should send login form as response """
@@ -736,7 +736,7 @@ class HTTPRequestHandler_TestCase(scaffold.TestCase):
             ...
             Called httprequest.Response.send_to_handler(...)
             """ % vars()
-        self.failUnlessMockTrackerMatch(expect_mock_output)
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_post_nobutton_login_sends_not_found_response(self):
         """ POST login with no button should send Not Found response """
@@ -747,7 +747,7 @@ class HTTPRequestHandler_TestCase(scaffold.TestCase):
             ...
             Called httprequest.Response.send_to_handler(...)
             """ % vars()
-        self.failUnlessMockTrackerMatch(expect_mock_output)
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_post_login_cancel_no_openid_redirects_to_root(self):
         """ Login cancel with no OpenID should redirect to root """
@@ -761,7 +761,7 @@ class HTTPRequestHandler_TestCase(scaffold.TestCase):
             ...
             Called httprequest.Response.send_to_handler(...)
             """ % vars()
-        self.failUnlessMockTrackerMatch(expect_mock_output)
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_post_openid_login_cancel_redirects_to_openid_url(self):
         """ Login cancel with OpenID should redirect to OpenID URL """
@@ -776,7 +776,7 @@ class HTTPRequestHandler_TestCase(scaffold.TestCase):
             ...
             Called httprequest.Response.send_to_handler(...)
             """ % vars()
-        self.failUnlessMockTrackerMatch(expect_mock_output)
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_post_login_bogus_user_sends_failure_response(self):
         """ POST login with bogus user should send failure response """
@@ -789,7 +789,7 @@ class HTTPRequestHandler_TestCase(scaffold.TestCase):
             ...
             Called httprequest.Response.send_to_handler(...)
             """ % vars()
-        self.failUnlessMockTrackerMatch(expect_mock_output)
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_post_login_wrong_password_sends_failure_response(self):
         """ POST login with wrong password should send failure response """
@@ -802,7 +802,7 @@ class HTTPRequestHandler_TestCase(scaffold.TestCase):
             ...
             Called httprequest.Response.send_to_handler(...)
             """ % vars()
-        self.failUnlessMockTrackerMatch(expect_mock_output)
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_post_login_auth_correct_no_openid_redirects_to_root(self):
         """ Login with no OpenID, correct details should redirect to root """
@@ -818,7 +818,7 @@ class HTTPRequestHandler_TestCase(scaffold.TestCase):
             Called httprequest.Response.send_to_handler(
                 ...)
             """ % vars()
-        self.failUnlessMockTrackerMatch(expect_mock_output)
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_post_openid_login_auth_correct_redirects_to_openid_url(self):
         """ Login correct with OpenID should redirect to OpenID URL """
@@ -833,7 +833,7 @@ class HTTPRequestHandler_TestCase(scaffold.TestCase):
             ...
             Called httprequest.Response.send_to_handler(...)
             """ % vars()
-        self.failUnlessMockTrackerMatch(expect_mock_output)
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_post_openid_login_auth_other_sends_wrong_auth(self):
         """ Login wrong auth with OpenID should send Auth Required """
@@ -845,7 +845,7 @@ class HTTPRequestHandler_TestCase(scaffold.TestCase):
             ...
             Called httprequest.Response.send_to_handler(...)
             """ % vars()
-        self.failUnlessMockTrackerMatch(expect_mock_output)
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_get_server_no_query_sends_about_site_response(self):
         """ GET to server without query should send About page """
@@ -858,7 +858,7 @@ class HTTPRequestHandler_TestCase(scaffold.TestCase):
             ...
             Called httprequest.Response.send_to_handler(...)
             """
-        self.failUnlessMockTrackerMatch(expect_mock_output)
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_get_server_bogus_query_sends_server_error_response(self):
         """ GET to server with bogus query should send Server Error """
@@ -879,7 +879,7 @@ class HTTPRequestHandler_TestCase(scaffold.TestCase):
             ...
             Called httprequest.Response.send_to_handler(...)
             """
-        self.failUnlessMockTrackerMatch(expect_mock_output)
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_get_server_assoc_query_delegates_to_openid(self):
         """ OpenID associate query should be passed to openid server """
@@ -897,7 +897,7 @@ class HTTPRequestHandler_TestCase(scaffold.TestCase):
             ...
             Called httprequest.Response.send_to_handler(...)
             """
-        self.failUnlessMockTrackerMatch(expect_mock_output)
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_checkid_immediate_no_session_returns_failure(self):
         """ OpenID check_immediate with no session should reject """
@@ -913,7 +913,7 @@ class HTTPRequestHandler_TestCase(scaffold.TestCase):
             ...
             Called httprequest.Response.send_to_handler(...)
             """
-        self.failUnlessMockTrackerMatch(expect_mock_output)
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_checkid_setup_wrong_session_returns_wrong_auth(self):
         """ OpenID checkid_setup with wrong session should request login """
@@ -932,7 +932,7 @@ class HTTPRequestHandler_TestCase(scaffold.TestCase):
                 ...
                 Called httprequest.Response.send_to_handler(...)
                 """
-            self.failUnlessMockTrackerMatch(expect_mock_output)
+            self.failUnlessMockCheckerMatch(expect_mock_output)
             self.mock_tracker.clear()
 
     def test_checkid_with_session_returns_success(self):
@@ -952,5 +952,5 @@ class HTTPRequestHandler_TestCase(scaffold.TestCase):
                 ...
                 Called httprequest.Response.send_to_handler(...)
                 """
-            self.failUnlessMockTrackerMatch(expect_mock_output)
+            self.failUnlessMockCheckerMatch(expect_mock_output)
             self.mock_tracker.clear()
