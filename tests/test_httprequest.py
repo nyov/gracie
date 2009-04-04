@@ -8,8 +8,8 @@
 # under the terms of the GNU General Public License, version 2 or later.
 # No warranty expressed or implied. See the file LICENSE for details.
 
-""" Unit test for httprequest module
-"""
+""" Unit test for httprequest module.
+    """
 
 import sys
 from StringIO import StringIO
@@ -25,6 +25,7 @@ from test_server import (
     )
 
 from gracie import httprequest
+from gracie import pagetemplate
 
 
 class Stub_Logger(object):
@@ -174,30 +175,38 @@ class Stub_Request(object):
         return Stub_TCPConnection(str(self))
 
 
-class Test_HTTPRequestHandler(scaffold.TestCase):
-    """ Test cases for HTTPRequestHandler class """
+class HTTPRequestHandler_TestCase(scaffold.TestCase):
+    """ Test cases for HTTPRequestHandler class. """
 
     def setUp(self):
         """ Set up test fixtures """
+        self.mock_tracker = scaffold.MockTracker()
+
         self.handler_class = httprequest.HTTPRequestHandler
 
-        self.stdout_prev = sys.stdout
         self.stdout_test = StringIO()
-        sys.stdout = self.stdout_test
 
-        self.response_class_prev = httprequest.Response
-        self.response_header_class_prev = httprequest.ResponseHeader
-        self.page_class_prev = httprequest.pagetemplate.Page
-        self.cookie_name_prev = httprequest.session_cookie_name
-        self.dispatch_method_prev = self.handler_class._dispatch
-        httprequest.Response = Mock('Response_class')
-        httprequest.Response.mock_returns = Mock('Response')
-        httprequest.ResponseHeader = Mock('ResponseHeader_class')
-        httprequest.ResponseHeader.mock_returns = Mock('ResponseHeader')
-        httprequest.pagetemplate.Page = Mock('Page_class')
-        httprequest.pagetemplate.Page.mock_returns = Mock('Page')
-        httprequest.session_cookie_name = "TEST_session"
-        mock_openid_server = Mock('openid_server')
+        scaffold.mock(
+            "httprequest.Response",
+            returns=Mock(
+                "httprequest.Response",
+                tracker=self.mock_tracker),
+            tracker=self.mock_tracker)
+        scaffold.mock(
+            "httprequest.ResponseHeader",
+            returns=Mock(
+                "httprequest.ResponseHeader",
+                tracker=self.mock_tracker),
+            tracker=self.mock_tracker)
+        scaffold.mock(
+            "pagetemplate.Page",
+            returns=Mock(
+                "pagetemplate.Page",
+                tracker=self.mock_tracker),
+            tracker=self.mock_tracker)
+        scaffold.mock(
+            "httprequest.session_cookie_name",
+            mock_obj="TEST_session")
 
         self.valid_requests = {
             'get-bogus': dict(
@@ -507,16 +516,13 @@ class Test_HTTPRequestHandler(scaffold.TestCase):
 
     def tearDown(self):
         """ Tear down test fixtures """
-        sys.stdout = self.stdout_prev
-        httprequest.Response = self.response_class_prev
-        httprequest.ResponseHeader = self.response_header_class_prev
-        httprequest.pagetemplate.Page = self.page_class_prev
-        httprequest.session_cookie_name = self.cookie_name_prev
-        self.handler_class._dispatch = self.dispatch_method_prev
+        scaffold.mock_restore()
 
     def _make_mock_openid_request(self, http_query):
         """ Make a mock OpenIDRequest for a given HTTP query """
-        openid_request = Mock('OpenIDRequest')
+        openid_request = Mock(
+            "OpenIDRequest",
+            tracker=self.mock_tracker)
         keys = ('mode', 'identity', 'trust_root', 'return_to')
         query_key_prefix = 'openid.'
         for key in keys:
@@ -534,7 +540,9 @@ class Test_HTTPRequestHandler(scaffold.TestCase):
         def stub_sign(obj):
             return obj
 
-        openid_server = Mock('openid_server')
+        openid_server = Mock(
+            "openid_server",
+            tracker=self.mock_tracker)
 
         if openid_request.mode:
             openid_server.decodeRequest.mock_returns = \
@@ -598,183 +606,162 @@ class Test_HTTPRequestHandler(scaffold.TestCase):
         """ When an error condition is raised, should send Server Error """
         class TestingError(StandardError):
             pass
-        def raise_Error(_):
-            raise TestingError("Testing error")
-        self.handler_class._dispatch = raise_Error
+        scaffold.mock(
+            "httprequest.HTTPRequestHandler._dispatch",
+            raises=TestingError("Testing error"),
+            tracker=self.mock_tracker)
 
         params = self.valid_requests['get-root']
         try:
             instance = self.handler_class(**params['args'])
         except TestingError:
             pass
-        expect_stdout = """\
-            Called ResponseHeader_class(500)
+        expect_mock_output = """\
             ...
-            Called Response.send_to_handler(...)
+            Called httprequest.ResponseHeader(500)
+            ...
+            Called httprequest.Response.send_to_handler(...)
             """
-        self.failUnlessOutputCheckerMatch(
-            expect_stdout, self.stdout_test.getvalue()
-            )
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_request_with_no_cookie_response_creates_session(self):
         """ With no session cookie, response should create new session """
         params = self.valid_requests['no-cookie']
         instance = self.handler_class(**params['args'])
-        expect_stdout = """\
-            Called ResponseHeader_class(200)
+        expect_mock_output = """\
+            Called httprequest.ResponseHeader(200)
             ...
-            Called Response.header.fields.append(
+            Called httprequest.Response.header.fields.append(
                 ('Set-Cookie', 'TEST_session=DEADBEEF'))
-            Called Response.send_to_handler(...)
+            Called httprequest.Response.send_to_handler(...)
             """
-        self.failUnlessOutputCheckerMatch(
-            expect_stdout, self.stdout_test.getvalue()
-            )
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_request_with_unknown_cookie_creates_new_session(self):
         """ With unknown username, response should create new session """
         params = self.valid_requests['unknown-cookie']
         instance = self.handler_class(**params['args'])
-        expect_stdout = """\
-            Called ResponseHeader_class(200)
+        expect_mock_output = """\
+            Called httprequest.ResponseHeader(200)
             ...
-            Called Response.header.fields.append(
+            Called httprequest.Response.header.fields.append(
                 ('Set-Cookie', 'TEST_session=DEADBEEF'))
-            Called Response.send_to_handler(...)
+            Called httprequest.Response.send_to_handler(...)
             """
-        self.failUnlessOutputCheckerMatch(
-            expect_stdout, self.stdout_test.getvalue()
-            )
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_request_with_good_cookie_response_logged_in(self):
         """ With good session cookie, response should send Logged In """
         params = self.valid_requests['good-cookie']
         identity_name = params['identity_name']
         instance = self.handler_class(**params['args'])
-        expect_stdout = """\
-            Called ResponseHeader_class(200)
+        expect_mock_output = """\
+            Called httprequest.ResponseHeader(200)
             ...
-            Called Response.header.fields.append(
+            Called httprequest.Response.header.fields.append(
                 ('Set-Cookie', 'TEST_session=DEADBEEF-%(identity_name)s'))
-            Called Response.send_to_handler(...)
+            Called httprequest.Response.send_to_handler(...)
             """ % vars()
-        self.failUnlessOutputCheckerMatch(
-            expect_stdout, self.stdout_test.getvalue()
-            )
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_get_root_sends_ok_response(self):
         """ Request to GET root document should send OK response """
         params = self.valid_requests['get-root']
         instance = self.handler_class(**params['args'])
-        expect_stdout = """\
-            Called ResponseHeader_class(200)
+        expect_mock_output = """\
+            Called httprequest.ResponseHeader(200)
             ...
-            Called Response.send_to_handler(...)
+            Called httprequest.Response.send_to_handler(...)
             """
-        self.failUnlessOutputCheckerMatch(
-            expect_stdout, self.stdout_test.getvalue()
-            )
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_get_bogus_url_sends_not_found_response(self):
         """ Request to GET unknown URL should send Not Found response """
         params = self.valid_requests['get-bogus']
         instance = self.handler_class(**params['args'])
-        expect_stdout = """\
-            Called ResponseHeader_class(404)
-            Called Page_class('...')
+        expect_mock_output = """\
+            Called httprequest.ResponseHeader(404)
+            Called pagetemplate.Page('...')
             ...
-            Called Response.send_to_handler(...)
+            Called httprequest.Response.send_to_handler(...)
             """ % vars()
-        self.failUnlessOutputCheckerMatch(
-            expect_stdout, self.stdout_test.getvalue()
-            )
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_get_bogus_identity_sends_not_found_response(self):
         """ Request to GET unknown user should send Not Found response """
         params = self.valid_requests['id-bogus']
         identity_name = params['identity_name']
         instance = self.handler_class(**params['args'])
-        expect_stdout = """\
-            Called ResponseHeader_class(404)
-            Called Page_class('...')
+        expect_mock_output = """\
+            Called httprequest.ResponseHeader(404)
+            Called pagetemplate.Page('...')
             ...
-            Called Response.send_to_handler(...)
+            Called httprequest.Response.send_to_handler(...)
             """ % vars()
-        self.failUnlessOutputCheckerMatch(
-            expect_stdout, self.stdout_test.getvalue()
-            )
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_get_known_identity_sends_view_user_response(self):
         """ Request to GET known user should send view user response """
         params = self.valid_requests['id-fred']
         identity_name = params['identity_name']
         instance = self.handler_class(**params['args'])
-        expect_stdout = """\
-            Called ResponseHeader_class(200)
-            Called Page_class('...')
+        expect_mock_output = """\
+            Called httprequest.ResponseHeader(200)
+            Called pagetemplate.Page('...')
             ...
-            Called Response.send_to_handler(...)
+            Called httprequest.Response.send_to_handler(...)
             """ % vars()
-        self.failUnlessOutputCheckerMatch(
-            expect_stdout, self.stdout_test.getvalue()
-            )
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def get_logout_creates_new_session_and_redirects(self):
         """ Request to logout should create new session and logout """
         params = self.valid_requests['logout']
         instance = self.handler_class(**params['args'])
-        expect_stdout = """\
-            Called ResponseHeader_class(302)
-            Called Response.header.fields.append('Location', ...)
-            Called Response.header.fields.append(
+        expect_mock_output = """\
+            Called httprequest.ResponseHeader(302)
+            Called httprequest.ResponseHeader.fields.append('Location', ...)
+            Called httprequest.ResponseHeader.fields.append(
                 ('Set-Cookie', 'TEST_session=DEADBEEF'))
-            Called Response.send_to_handler(...)
+            Called httprequest.Response.send_to_handler(...)
             """
-        self.failUnlessOutputCheckerMatch(
-            expect_stdout, self.stdout_test.getvalue()
-            )
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_get_login_sends_login_form_response(self):
         """ Request to GET login should send login form as response """
         params = self.valid_requests['login']
         instance = self.handler_class(**params['args'])
-        expect_stdout = """\
-            Called ResponseHeader_class(200)
-            Called Page_class('Login')
+        expect_mock_output = """\
+            Called httprequest.ResponseHeader(200)
+            Called pagetemplate.Page('Login')
             ...
-            Called Response.send_to_handler(...)
+            Called httprequest.Response.send_to_handler(...)
             """ % vars()
-        self.failUnlessOutputCheckerMatch(
-            expect_stdout, self.stdout_test.getvalue()
-            )
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_post_nobutton_login_sends_not_found_response(self):
         """ POST login with no button should send Not Found response """
         params = self.valid_requests['nobutton-login']
         instance = self.handler_class(**params['args'])
-        expect_stdout = """\
-            Called ResponseHeader_class(404)
+        expect_mock_output = """\
+            Called httprequest.ResponseHeader(404)
             ...
-            Called Response.send_to_handler(...)
+            Called httprequest.Response.send_to_handler(...)
             """ % vars()
-        self.failUnlessOutputCheckerMatch(
-            expect_stdout, self.stdout_test.getvalue()
-            )
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_post_login_cancel_no_openid_redirects_to_root(self):
         """ Login cancel with no OpenID should redirect to root """
         params = self.valid_requests['cancel-login']
         instance = self.handler_class(**params['args'])
         root_url = params['server'].gracie_server.opts.root_url
-        expect_stdout = """\
-            Called ResponseHeader_class(302)
-            Called ResponseHeader.fields.append(('Location', %(root_url)r))
+        expect_mock_output = """\
+            Called httprequest.ResponseHeader(302)
+            Called httprequest.ResponseHeader.fields.append(
+                ('Location', %(root_url)r))
             ...
-            Called Response.send_to_handler(...)
+            Called httprequest.Response.send_to_handler(...)
             """ % vars()
-        self.failUnlessOutputCheckerMatch(
-            expect_stdout, self.stdout_test.getvalue()
-            )
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_post_openid_login_cancel_redirects_to_openid_url(self):
         """ Login cancel with OpenID should redirect to OpenID URL """
@@ -782,46 +769,40 @@ class Test_HTTPRequestHandler(scaffold.TestCase):
         openid_request = params['session']['last_openid_request']
         instance = self.handler_class(**params['args'])
         return_url = openid_request.answer(False).encodeToURL()
-        expect_stdout = """\
-            Called ResponseHeader_class(302)
-            Called ResponseHeader.fields.append(
+        expect_mock_output = """\
+            Called httprequest.ResponseHeader(302)
+            Called httprequest.ResponseHeader.fields.append(
                 ('Location', %(return_url)r))
             ...
-            Called Response.send_to_handler(...)
+            Called httprequest.Response.send_to_handler(...)
             """ % vars()
-        self.failUnlessOutputCheckerMatch(
-            expect_stdout, self.stdout_test.getvalue()
-            )
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_post_login_bogus_user_sends_failure_response(self):
         """ POST login with bogus user should send failure response """
         params = self.valid_requests['login-bogus']
         identity_name = params['identity_name']
         instance = self.handler_class(**params['args'])
-        expect_stdout = """\
-            Called ResponseHeader_class(200)
-            Called Page_class('Login Failed')
+        expect_mock_output = """\
+            Called httprequest.ResponseHeader(200)
+            Called pagetemplate.Page('Login Failed')
             ...
-            Called Response.send_to_handler(...)
+            Called httprequest.Response.send_to_handler(...)
             """ % vars()
-        self.failUnlessOutputCheckerMatch(
-            expect_stdout, self.stdout_test.getvalue()
-            )
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_post_login_wrong_password_sends_failure_response(self):
         """ POST login with wrong password should send failure response """
         params = self.valid_requests['login-fred-wrong']
         identity_name = params['identity_name']
         instance = self.handler_class(**params['args'])
-        expect_stdout = """\
-            Called ResponseHeader_class(200)
-            Called Page_class('Login Failed')
+        expect_mock_output = """\
+            Called httprequest.ResponseHeader(200)
+            Called pagetemplate.Page('Login Failed')
             ...
-            Called Response.send_to_handler(...)
+            Called httprequest.Response.send_to_handler(...)
             """ % vars()
-        self.failUnlessOutputCheckerMatch(
-            expect_stdout, self.stdout_test.getvalue()
-            )
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_post_login_auth_correct_no_openid_redirects_to_root(self):
         """ Login with no OpenID, correct details should redirect to root """
@@ -829,16 +810,15 @@ class Test_HTTPRequestHandler(scaffold.TestCase):
         identity_name = params['identity_name']
         root_url = params['server'].gracie_server.opts.root_url
         instance = self.handler_class(**params['args'])
-        expect_stdout = """\
-            Called ResponseHeader_class(302)
-            Called ResponseHeader.fields.append(('Location', %(root_url)r))
+        expect_mock_output = """\
+            Called httprequest.ResponseHeader(302)
+            Called httprequest.ResponseHeader.fields.append(
+                ('Location', %(root_url)r))
             ...
-            Called Response.send_to_handler(
+            Called httprequest.Response.send_to_handler(
                 ...)
             """ % vars()
-        self.failUnlessOutputCheckerMatch(
-            expect_stdout, self.stdout_test.getvalue()
-            )
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_post_openid_login_auth_correct_redirects_to_openid_url(self):
         """ Login correct with OpenID should redirect to OpenID URL """
@@ -846,45 +826,39 @@ class Test_HTTPRequestHandler(scaffold.TestCase):
         openid_request = params['session']['last_openid_request']
         instance = self.handler_class(**params['args'])
         return_url = openid_request.answer(True).encodeToURL()
-        expect_stdout = """\
-            Called ResponseHeader_class(302)
-            Called ResponseHeader.fields.append(
+        expect_mock_output = """\
+            Called httprequest.ResponseHeader(302)
+            Called httprequest.ResponseHeader.fields.append(
                 ('Location', %(return_url)r))
             ...
-            Called Response.send_to_handler(...)
+            Called httprequest.Response.send_to_handler(...)
             """ % vars()
-        self.failUnlessOutputCheckerMatch(
-            expect_stdout, self.stdout_test.getvalue()
-            )
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_post_openid_login_auth_other_sends_wrong_auth(self):
         """ Login wrong auth with OpenID should send Auth Required """
         params = self.valid_requests['openid-login-bill-other']
         instance = self.handler_class(**params['args'])
-        expect_stdout = """\
-            Called ResponseHeader_class(200)
-            Called Page_class('Authentication Required')
+        expect_mock_output = """\
+            Called httprequest.ResponseHeader(200)
+            Called pagetemplate.Page('Authentication Required')
             ...
-            Called Response.send_to_handler(...)
+            Called httprequest.Response.send_to_handler(...)
             """ % vars()
-        self.failUnlessOutputCheckerMatch(
-            expect_stdout, self.stdout_test.getvalue()
-            )
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_get_server_no_query_sends_about_site_response(self):
         """ GET to server without query should send About page """
         params = self.valid_requests['openid-no-query']
         instance = self.handler_class(**params['args'])
-        expect_stdout = """\
+        expect_mock_output = """\
             Called openid_server.decodeRequest(...)
-            Called ResponseHeader_class(200)
-            Called Page_class('About this site')
+            Called httprequest.ResponseHeader(200)
+            Called pagetemplate.Page('About this site')
             ...
-            Called Response.send_to_handler(...)
+            Called httprequest.Response.send_to_handler(...)
             """
-        self.failUnlessOutputCheckerMatch(
-            expect_stdout, self.stdout_test.getvalue()
-            )
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_get_server_bogus_query_sends_server_error_response(self):
         """ GET to server with bogus query should send Server Error """
@@ -900,14 +874,12 @@ class Test_HTTPRequestHandler(scaffold.TestCase):
             instance = self.handler_class(**args)
         except Stub_OpenIDError:
             pass
-        expect_stdout = """\
-            Called ResponseHeader_class(500)
+        expect_mock_output = """\
+            Called httprequest.ResponseHeader(500)
             ...
-            Called Response.send_to_handler(...)
+            Called httprequest.Response.send_to_handler(...)
             """
-        self.failUnlessOutputCheckerMatch(
-            expect_stdout, self.stdout_test.getvalue()
-            )
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_get_server_assoc_query_delegates_to_openid(self):
         """ OpenID associate query should be passed to openid server """
@@ -915,19 +887,17 @@ class Test_HTTPRequestHandler(scaffold.TestCase):
         args = params['args']
         server = args['server']
         instance = self.handler_class(**args)
-        expect_stdout = """\
+        expect_mock_output = """\
             Called openid_server.decodeRequest(...)
             Called openid_server.handleRequest(...)
             Called openid_server.encodeResponse(...)
-            Called ResponseHeader_class(200)
-            Called ResponseHeader.fields.append(('openid', 'yes'))
-            Called Response_class(..., 'OpenID response')
+            Called httprequest.ResponseHeader(200)
+            Called httprequest.ResponseHeader.fields.append(('openid', 'yes'))
+            Called httprequest.Response(..., 'OpenID response')
             ...
-            Called Response.send_to_handler(...)
+            Called httprequest.Response.send_to_handler(...)
             """
-        self.failUnlessOutputCheckerMatch(
-            expect_stdout, self.stdout_test.getvalue()
-            )
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_checkid_immediate_no_session_returns_failure(self):
         """ OpenID check_immediate with no session should reject """
@@ -936,16 +906,14 @@ class Test_HTTPRequestHandler(scaffold.TestCase):
         args = params['args']
         server = args['server']
         instance = self.handler_class(**args)
-        expect_stdout = """\
+        expect_mock_output = """\
             Called openid_server.decodeRequest(...)
             Called OpenIDRequest.answer(False, ...)
             Called openid_server.encodeResponse(...)
             ...
-            Called Response.send_to_handler(...)
+            Called httprequest.Response.send_to_handler(...)
             """
-        self.failUnlessOutputCheckerMatch(
-            expect_stdout, self.stdout_test.getvalue()
-            )
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_checkid_setup_wrong_session_returns_wrong_auth(self):
         """ OpenID checkid_setup with wrong session should request login """
@@ -957,16 +925,15 @@ class Test_HTTPRequestHandler(scaffold.TestCase):
             args = params['args']
             server = args['server']
             instance = self.handler_class(**args)
-            expect_stdout = """\
+            expect_mock_output = """\
                 Called openid_server.decodeRequest(...)
-                Called ResponseHeader_class(200)
-                Called Page_class('Authentication Required')
+                Called httprequest.ResponseHeader(200)
+                Called pagetemplate.Page('Authentication Required')
                 ...
-                Called Response.send_to_handler(...)
+                Called httprequest.Response.send_to_handler(...)
                 """
-            self.failUnlessOutputCheckerMatch(
-                expect_stdout, self.stdout_test.getvalue()
-                )
+            self.failUnlessMockCheckerMatch(expect_mock_output)
+            self.mock_tracker.clear()
 
     def test_checkid_with_session_returns_success(self):
         """ OpenID checkid with right session should succeed """
@@ -978,13 +945,12 @@ class Test_HTTPRequestHandler(scaffold.TestCase):
             args = params['args']
             server = args['server']
             instance = self.handler_class(**args)
-            expect_stdout = """\
+            expect_mock_output = """\
                 Called openid_server.decodeRequest(...)
                 Called OpenIDRequest.answer(True)
                 Called openid_server.encodeResponse(...)
                 ...
-                Called Response.send_to_handler(...)
+                Called httprequest.Response.send_to_handler(...)
                 """
-            self.failUnlessOutputCheckerMatch(
-                expect_stdout, self.stdout_test.getvalue()
-                )
+            self.failUnlessMockCheckerMatch(expect_mock_output)
+            self.mock_tracker.clear()

@@ -8,8 +8,8 @@
 # under the terms of the GNU General Public License, version 2 or later.
 # No warranty expressed or implied. See the file LICENSE for details.
 
-""" Unit test for gracied daemon module
-"""
+""" Unit test for gracied daemon module.
+    """
 
 import sys
 import os
@@ -37,33 +37,33 @@ class Stub_GracieServer(object):
         pass
 
 
-class Test_Gracie(scaffold.TestCase):
-    """ Test cases for Gracie class """
+class Gracie_TestCase(scaffold.TestCase):
+    """ Test cases for Gracie class. """
     def setUp(self):
         """ Set up test fixtures """
+        self.mock_tracker = scaffold.MockTracker()
 
         self.app_class = gracied.Gracie
 
-        self.mock_outfile = StringIO()
-        self.mock_tracker = scaffold.MockTracker(self.mock_outfile)
-
-        self.stdout_prev = sys.stdout
         self.stdout_test = StringIO()
-        sys.stdout = self.stdout_test
+        scaffold.mock("sys.stdout", mock_obj=self.stdout_test)
 
-        self.parser_error_prev = gracied.OptionParser.error
-        gracied.OptionParser.error = Mock(
-            "OptionParser.error",
-            raises=SystemExit)
+        scaffold.mock(
+            "gracied.OptionParser.error",
+            raises=SystemExit,
+            tracker=self.mock_tracker)
 
-        self.stub_server_class = Stub_GracieServer
-        self.mock_server_class = Mock('GracieServer_class')
-        self.mock_server_class.mock_returns = Mock('GracieServer')
+        scaffold.mock(
+            "gracied.GracieServer",
+            returns=Mock(
+                "gracied.GracieServer",
+                tracker=self.mock_tracker),
+            tracker=self.mock_tracker)
 
-        self.server_class_prev = gracied.GracieServer
-        gracied.GracieServer = self.stub_server_class
-        self.default_port_prev = gracied.default_port
-        gracied.default_port = 7654
+        scaffold.mock("gracied.default_port", mock_obj=7654)
+        scaffold.mock(
+            "gracied.become_daemon",
+            tracker=self.mock_tracker)
 
         self.valid_apps = {
             'simple': dict(
@@ -114,11 +114,6 @@ class Test_Gracie(scaffold.TestCase):
 
     def tearDown(self):
         """ Tear down test fixtures """
-        self.stdout_test.truncate(0)
-        sys.stdout = self.stdout_prev
-        gracied.OptionParser.error = self.parser_error_prev
-        gracied.GracieServer = self.server_class_prev
-        gracied.default_port = self.default_port_prev
         scaffold.mock_restore()
 
     def test_instantiate(self):
@@ -132,33 +127,32 @@ class Test_Gracie(scaffold.TestCase):
         params = self.valid_apps['simple']
         args = params['args']
         logging_prev = gracied.logging
-        gracied.logging = Mock('logging')
-        expect_stdout = """\
-           Called logging.basicConfig(...)
+        scaffold.mock(
+            "gracied.logging",
+            tracker=self.mock_tracker)
+        expect_mock_output = """\
+           Called gracied.logging.basicConfig(...)
            """
         instance = self.app_class(**args)
         gracied.logging = logging_prev
-        self.failUnlessOutputCheckerMatch(
-            expect_stdout, self.stdout_test.getvalue()
-            )
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_wrong_arguments_invokes_parser_error(self):
         """ Wrong number of cmdline arguments should invoke parser error """
-        gracied.OptionParser.error = Mock(
-            "OptionParser.error",
-            )
         invalid_argv_params = [
             ["progname", "foo",]
             ]
-        expect_stdout = """\
-            Called OptionParser.error("...")
+        expect_error = gracied.OptionParser.error.mock_raises
+        expect_mock_output = """\
+            Called gracied.OptionParser.error("...")
             """
         for argv in invalid_argv_params:
             args = dict(argv=argv)
-            instance = self.app_class(**args)
-            self.failUnlessOutputCheckerMatch(
-                expect_stdout, self.stdout_test.getvalue()
-                )
+            try:
+                instance = self.app_class(**args)
+            except expect_error:
+                pass
+            self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_opts_version_performs_version_action(self):
         """ Gracie instance should perform version action """
@@ -186,7 +180,6 @@ class Test_Gracie(scaffold.TestCase):
         expect_stdout = """\
             Usage: ...
             """
-        gracied.GracieServer = self.mock_server_class
         self.failUnlessRaises(
             SystemExit,
             self.app_class, **args
@@ -241,16 +234,13 @@ class Test_Gracie(scaffold.TestCase):
         instance = params['instance']
         host = gracied.default_host
         port = gracied.default_port
-        expect_stdout = """\
-            Called GracieServer_class(
+        expect_mock_output = """\
+            Called gracied.GracieServer(
                 (%(host)r, %(port)r),
                 <Values at ...: {...}>)
             ...""" % vars()
-        gracied.GracieServer = self.mock_server_class
         instance.main()
-        self.failUnlessOutputCheckerMatch(
-            expect_stdout, self.stdout_test.getvalue()
-            )
+        self.failUnlessMockCheckerMatch(expect_mock_output)
         self.failIfIs(instance.server, None)
 
     def test_main_sets_specified_socket_params(self):
@@ -264,52 +254,45 @@ class Test_Gracie(scaffold.TestCase):
             port = params.get('port', gracied.default_port)
             if (host, port) == default_address:
                 continue
-            expect_stdout = """\
-                Called GracieServer_class(
+            expect_mock_output = """\
+                Called gracied.GracieServer(
                     (%(host)r, %(port)r),
                     <Values at ...: {...}>)
                 ...""" % vars()
-            gracied.GracieServer = self.mock_server_class
             instance.main()
-            self.failUnlessOutputCheckerMatch(
-                expect_stdout, self.stdout_test.getvalue()
-                )
-            self.stdout_test.truncate(0)
+            self.failUnlessMockCheckerMatch(expect_mock_output)
+            self.mock_tracker.clear()
 
     def test_main_calls_become_daemon(self):
         """ main() should attempt to become a daemon """
         params = self.valid_apps['simple']
         instance = params['instance']
-        gracied.become_daemon = Mock('become_daemon')
-        expect_stdout = """\
-            Called become_daemon()
+        expect_mock_output = """\
+            ...
+            Called gracied.become_daemon()
+            ...
             """
         instance.main()
-        self.failUnlessOutputCheckerMatch(
-            expect_stdout, self.stdout_test.getvalue()
-            )
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_main_starts_server(self):
         """ main() should start GracieServer if child fork """
         params = self.valid_apps['simple']
         instance = params['instance']
         port = gracied.default_port
-        expect_stdout = """\
+        expect_mock_output = """\
             ...
-            Called GracieServer.serve_forever()
+            Called gracied.GracieServer.serve_forever()
             """
-        gracied.GracieServer = self.mock_server_class
         instance.main()
-        self.failUnlessOutputCheckerMatch(
-            expect_stdout, self.stdout_test.getvalue()
-            )
+        self.failUnlessMockCheckerMatch(expect_mock_output)
 
 
-class Test_ProgramMain(scaffold.Test_ProgramMain):
-    """ Test cases for module __main__ function """
+class ProgramMain_TestCase(scaffold.ProgramMain_TestCase):
+    """ Test cases for program __main__ function. """
 
     def setUp(self):
         """ Set up test fixtures """
         self.program_module = gracied
         self.application_class = gracied.Gracie
-        super(Test_ProgramMain, self).setUp()
+        super(ProgramMain_TestCase, self).setUp()

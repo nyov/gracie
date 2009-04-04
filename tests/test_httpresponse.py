@@ -8,8 +8,8 @@
 # under the terms of the GNU General Public License, version 2 or later.
 # No warranty expressed or implied. See the file LICENSE for details.
 
-""" Unit test for httpresponse module
-"""
+""" Unit test for httpresponse module.
+    """
 
 import sys
 from StringIO import StringIO
@@ -23,8 +23,8 @@ from test_server import (
 from gracie import httpresponse
 
 
-class Test_ResponseHeader(scaffold.TestCase):
-    """ Test cases for ResponseHeader class """
+class ResponseHeader_TestCase(scaffold.TestCase):
+    """ Test cases for ResponseHeader class. """
 
     def setUp(self):
         """ Set up test fixtures """
@@ -119,11 +119,12 @@ class Stub_RequestHandler(object):
     def end_headers(self):
         pass
 
-class Test_Response(scaffold.TestCase):
-    """ Test cases for Response class """
+class Response_TestCase(scaffold.TestCase):
+    """ Test cases for Response class. """
 
     def setUp(self):
         """ Set up test fixtures """
+        self.mock_tracker = scaffold.MockTracker()
 
         self.response_class = httpresponse.Response
 
@@ -170,20 +171,16 @@ class Test_Response(scaffold.TestCase):
 
     def test_send_to_handler_uses_handler(self):
         """ Response.send_to_handler should use specified handler """
-        self.stdout_test = StringIO("")
-        stdout_prev = sys.stdout
-        sys.stdout = self.stdout_test
         for params in self.valid_responses.values():
             instance = params['instance']
-            handler = Mock('HTTPRequestHandler')
+            handler = Mock(
+                'HTTPRequestHandler',
+                tracker=self.mock_tracker)
             instance.send_to_handler(handler)
-            expect_stdout = """\
+            expect_mock_output = """\
                 Called HTTPRequestHandler.send_response(...)
                 ...Called HTTPRequestHandler.end_headers()
                 Called HTTPRequestHandler.wfile.write(...)
                 Called HTTPRequestHandler.wfile.close()
                 """
-            self.failUnlessOutputCheckerMatch(
-                expect_stdout, self.stdout_test.getvalue()
-                )
-        sys.stdout = stdout_prev
+            self.failUnlessMockCheckerMatch(expect_mock_output)

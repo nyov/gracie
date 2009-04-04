@@ -8,8 +8,8 @@
 # under the terms of the GNU General Public License, version 2 or later.
 # No warranty expressed or implied. See the file LICENSE for details.
 
-""" Unit test for httpserver module
-"""
+""" Unit test for httpserver module.
+    """
 
 import sys
 from StringIO import StringIO
@@ -22,8 +22,8 @@ from test_gracied import Stub_GracieServer
 from gracie import httpserver
 
 
-class Test_net_location(scaffold.TestCase):
-    """ Test cases for net_location function """
+class net_location_TestCase(scaffold.TestCase):
+    """ Test cases for net_location function. """
 
     def setUp(self):
         """ Set up test fixtures """
@@ -55,14 +55,12 @@ class Stub_HTTPRequestHandler(object):
     """ Stub class for HTTPRequestHandler """
 
 
-class Test_HTTPServer(scaffold.TestCase):
-    """ Test cases for HTTPServer class """
+class HTTPServer_TestCase(scaffold.TestCase):
+    """ Test cases for HTTPServer class. """
 
     def setUp(self):
         """ Set up test fixtures """
-
-        self.mock_outfile = StringIO()
-        self.mock_tracker = scaffold.MockTracker(self.mock_outfile)
+        self.mock_tracker = scaffold.MockTracker()
 
         self.server_class = httpserver.HTTPServer
 

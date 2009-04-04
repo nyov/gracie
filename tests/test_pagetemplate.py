@@ -8,8 +8,8 @@
 # under the terms of the GNU General Public License, version 2 or later.
 # No warranty expressed or implied. See the file LICENSE for details.
 
-""" Unit test for pagetemplate module
-"""
+""" Unit test for pagetemplate module.
+    """
 
 from string import Template
 import textwrap
@@ -19,45 +19,41 @@ import scaffold
 from gracie import pagetemplate
 
 
-class Mixin_PageTemplateFixture(object):
-    """ Mix-in class for page template fixtures """
+def setup_PageTemplate_fixtures(testcase):
+    """ Set up fixtures for PageTemplate test usage. """
+    mock_page_template = Template(
+        textwrap.dedent("""\
+            Page {
+                Coding: $character_encoding
+                Title: $page_title
+                $page_body
+            }""")
+        )
 
-    def setUp(self):
-        """ Set up test fixtures """
+    mock_body_template = Template(
+        textwrap.dedent("""\
+            Body {
+                Title: $page_title
+                Auth entry: $auth_entry
+                Content: $page_content
+            }""")
+        )
 
-        pagetemplate.page_template = Template(
-            textwrap.dedent("""\
-                Page {
-                    Coding: $character_encoding
-                    Title: $page_title
-                    $page_body
-                }""")
-            )
-
-        pagetemplate.body_template = Template(
-            textwrap.dedent("""\
-                Body {
-                    Title: $page_title
-                    Auth entry: $auth_entry
-                    Content: $page_content
-                }""")
-            )
-
-    def tearDown(self):
-        """ Tear down test fixtures """
+    scaffold.mock(
+        "pagetemplate.page_template",
+        mock_obj=mock_page_template)
+    scaffold.mock(
+        "pagetemplate.body_template",
+        mock_obj=mock_body_template)
 
 
-class Test_Page(
-    scaffold.TestCase,
-    Mixin_PageTemplateFixture):
-    """ Test cases for Page class """
+class Page_TestCase(scaffold.TestCase):
+    """ Test cases for Page class. """
 
     def setUp(self):
-        """ Set up test fixtures """
-
+        """ Set up test fixtures. """
         self.page_class = pagetemplate.Page
-
-        Mixin_PageTemplateFixture.setUp(self)
+        setup_PageTemplate_fixtures(self)
 
         self.valid_pages = {
             'simple': dict(
@@ -109,6 +105,10 @@ class Test_Page(
                 ))
             instance.values.update(values)
             params['instance'] = instance
+
+    def tearDown(self):
+        """ Tear down test fixtures. """
+        scaffold.mock_restore()
 
     def test_instantiate(self):
         """ New Page instance should be created """
@@ -174,8 +174,16 @@ class Test_Page(
         self.failUnlessOutputCheckerMatch(expect_data, page_data)
 
 
-class Test_PageTemplates(scaffold.TestCase):
-    """ Test cases for individual page templates """
+class PageTemplates_TestCase(scaffold.TestCase):
+    """ Test cases for individual page templates. """
+
+    def setUp(self):
+        """ Set up test fixtures. """
+        setup_PageTemplate_fixtures(self)
+
+    def tearDown(self):
+        """ Tear down test fixtures. """
+        scaffold.mock_restore()
 
     def test_internal_error_page_contains_message(self):
         """ Internal Error page should contain specified message """

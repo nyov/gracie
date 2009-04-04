@@ -8,16 +8,16 @@
 # under the terms of the GNU General Public License, version 2 or later.
 # No warranty expressed or implied. See the file LICENSE for details.
 
-""" Unit test for authservice module
-"""
+""" Unit test for authservice module.
+    """
 
 import scaffold
 
 from gracie import authservice
 
 
-class Test_ModuleExceptions(scaffold.Test_Exception):
-    """ Test cases for module exceptions """
+class ModuleExceptions_TestCase(scaffold.Exception_TestCase):
+    """ Test cases for module exceptions. """
 
     def setUp(self):
         """ Set up test fixtures """
@@ -28,7 +28,7 @@ class Test_ModuleExceptions(scaffold.Test_Exception):
                 ),
             }
 
-        super(Test_ModuleExceptions, self).setUp()
+        super(ModuleExceptions_TestCase, self).setUp()
 
     def test_autherror_string_contains_reason(self):
         """ AuthenticationError string should contain code and reason """
@@ -44,8 +44,8 @@ class Test_ModuleExceptions(scaffold.Test_Exception):
             )
 
 
-class Test_BaseAuthService(scaffold.TestCase):
-    """ Test cases for AuthService class """
+class BaseAuthService_TestCase(scaffold.TestCase):
+    """ Test cases for AuthService class. """
 
     def setUp(self):
         """ Set up test fixtures """
@@ -140,8 +140,8 @@ class Stub_PwdModule(object):
             raise KeyError("uid not found: %(uid)s" % vars())
         return entry
 
-class Test_PosixAuthService(scaffold.TestCase):
-    """ Test cases for PosixAuthService class """
+class PosixAuthService_TestCase(scaffold.TestCase):
+    """ Test cases for PosixAuthService class. """
 
     def setUp(self):
         """ Set up test fixtures """
@@ -291,8 +291,8 @@ class Stub_PamModule(object):
 stub_pam_module = Stub_PamModule()
 PAM = stub_pam_module
 
-class Test_PamAuthService(scaffold.TestCase):
-    """ Test cases for PamAuthService class """
+class PamAuthService_TestCase(scaffold.TestCase):
+    """ Test cases for PamAuthService class. """
 
     def setUp(self):
         """ Set up test fixtures """

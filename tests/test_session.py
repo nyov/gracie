@@ -8,8 +8,8 @@
 # under the terms of the GNU General Public License, version 2 or later.
 # No warranty expressed or implied. See the file LICENSE for details.
 
-""" Unit test for session module
-"""
+""" Unit test for session module.
+    """
 
 import sys
 
@@ -18,8 +18,8 @@ import scaffold
 from gracie import session
 
 
-class Test_SessionManager(scaffold.TestCase):
-    """ Test cases for SessionManager class """
+class SessionManager_TestCase(scaffold.TestCase):
+    """ Test cases for SessionManager class. """
 
     def setUp(self):
         """ Set up test fixtures """
