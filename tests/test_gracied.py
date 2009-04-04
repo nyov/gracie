@@ -8,8 +8,8 @@
 # under the terms of the GNU General Public License, version 2 or later.
 # No warranty expressed or implied. See the file LICENSE for details.
 
-""" Unit test for gracied daemon module
-"""
+""" Unit test for gracied daemon module.
+    """
 
 import sys
 import os
@@ -37,8 +37,8 @@ class Stub_GracieServer(object):
         pass
 
 
-class Test_Gracie(scaffold.TestCase):
-    """ Test cases for Gracie class """
+class Gracie_TestCase(scaffold.TestCase):
+    """ Test cases for Gracie class. """
     def setUp(self):
         """ Set up test fixtures """
         self.mock_tracker = scaffold.MockTracker()
@@ -288,11 +288,11 @@ class Test_Gracie(scaffold.TestCase):
         self.failUnlessMockTrackerMatch(expect_mock_output)
 
 
-class Test_ProgramMain(scaffold.Test_ProgramMain):
-    """ Test cases for module __main__ function """
+class ProgramMain_TestCase(scaffold.ProgramMain_TestCase):
+    """ Test cases for program __main__ function. """
 
     def setUp(self):
         """ Set up test fixtures """
         self.program_module = gracied
         self.application_class = gracied.Gracie
-        super(Test_ProgramMain, self).setUp()
+        super(ProgramMain_TestCase, self).setUp()

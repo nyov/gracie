@@ -8,8 +8,8 @@
 # under the terms of the GNU General Public License, version 2 or later.
 # No warranty expressed or implied. See the file LICENSE for details.
 
-""" Unit test for pagetemplate module
-"""
+""" Unit test for pagetemplate module.
+    """
 
 from string import Template
 import textwrap
@@ -47,10 +47,10 @@ class Mixin_PageTemplateFixture(object):
         """ Tear down test fixtures """
 
 
-class Test_Page(
+class Page_TestCase(
     scaffold.TestCase,
     Mixin_PageTemplateFixture):
-    """ Test cases for Page class """
+    """ Test cases for Page class. """
 
     def setUp(self):
         """ Set up test fixtures """
@@ -174,8 +174,8 @@ class Test_Page(
         self.failUnlessOutputCheckerMatch(expect_data, page_data)
 
 
-class Test_PageTemplates(scaffold.TestCase):
-    """ Test cases for individual page templates """
+class PageTemplates_TestCase(scaffold.TestCase):
+    """ Test cases for individual page templates. """
 
     def test_internal_error_page_contains_message(self):
         """ Internal Error page should contain specified message """

@@ -8,8 +8,8 @@
 # under the terms of the GNU General Public License, version 2 or later.
 # No warranty expressed or implied. See the file LICENSE for details.
 
-""" Unit test for authorisation module
-"""
+""" Unit test for authorisation module.
+    """
 
 import sys
 
@@ -18,8 +18,8 @@ import scaffold
 from gracie import authorisation
 
 
-class Test_ConsumerAuthStore(scaffold.TestCase):
-    """ Test cases for ConsumerAuthStore class """
+class ConsumerAuthStore_TestCase(scaffold.TestCase):
+    """ Test cases for ConsumerAuthStore class. """
 
     def setUp(self):
         """ Set up test fixtures """

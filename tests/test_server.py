@@ -8,8 +8,8 @@
 # under the terms of the GNU General Public License, version 2 or later.
 # No warranty expressed or implied. See the file LICENSE for details.
 
-""" Unit test for server module
-"""
+""" Unit test for server module.
+    """
 
 import __builtin__
 import sys
@@ -23,8 +23,8 @@ from scaffold import Mock
 from gracie import server
 
 
-class Test_remove_standard_files(scaffold.TestCase):
-    """ Test cases for remove_standard_files function """
+class remove_standard_files_TestCase(scaffold.TestCase):
+    """ Test cases for remove_standard_files function. """
 
     def setUp(self):
         """ Set up test fixtures """
@@ -42,8 +42,8 @@ class Test_remove_standard_files(scaffold.TestCase):
         scaffold.mock_restore()
 
 
-class Test_create_pid_file(scaffold.TestCase):
-    """ Test cases for create_pid_file function """
+class create_pid_file_TestCase(scaffold.TestCase):
+    """ Test cases for create_pid_file function. """
 
     def setUp(self):
         """ Set up test fixtures """
@@ -81,8 +81,8 @@ class Test_create_pid_file(scaffold.TestCase):
             )
 
 
-class Test_remove_pid_file(scaffold.TestCase):
-    """ Test cases for remove_pid_file function """
+class remove_pid_file_TestCase(scaffold.TestCase):
+    """ Test cases for remove_pid_file function. """
 
     def setUp(self):
         """ Set up test fixtures """
@@ -106,8 +106,8 @@ class Test_remove_pid_file(scaffold.TestCase):
         self.failUnlessMockTrackerMatch(expect_mock_output)
 
 
-class Test_become_daemon(scaffold.TestCase):
-    """ Test cases for become_daemon function """
+class become_daemon_TestCase(scaffold.TestCase):
+    """ Test cases for become_daemon function. """
 
     def setUp(self):
         """ Set up test fixtures """
@@ -363,8 +363,8 @@ def make_default_opts():
     return opts
 
 
-class Test_GracieServer(scaffold.TestCase):
-    """ Test cases for GracieServer class """
+class GracieServer_TestCase(scaffold.TestCase):
+    """ Test cases for GracieServer class. """
 
     def setUp(self):
         """ Set up test fixtures """

@@ -8,8 +8,8 @@
 # under the terms of the GNU General Public License, version 2 or later.
 # No warranty expressed or implied. See the file LICENSE for details.
 
-""" Unit test for httprequest module
-"""
+""" Unit test for httprequest module.
+    """
 
 import sys
 from StringIO import StringIO
@@ -175,8 +175,8 @@ class Stub_Request(object):
         return Stub_TCPConnection(str(self))
 
 
-class Test_HTTPRequestHandler(scaffold.TestCase):
-    """ Test cases for HTTPRequestHandler class """
+class HTTPRequestHandler_TestCase(scaffold.TestCase):
+    """ Test cases for HTTPRequestHandler class. """
 
     def setUp(self):
         """ Set up test fixtures """
