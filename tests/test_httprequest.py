@@ -933,7 +933,7 @@ class Test_HTTPRequestHandler(scaffold.TestCase):
                 Called httprequest.Response.send_to_handler(...)
                 """
             self.failUnlessMockTrackerMatch(expect_mock_output)
-            self.mock_tracker.out.truncate(0)
+            self.mock_tracker.clear()
 
     def test_checkid_with_session_returns_success(self):
         """ OpenID checkid with right session should succeed """
@@ -953,4 +953,4 @@ class Test_HTTPRequestHandler(scaffold.TestCase):
                 Called httprequest.Response.send_to_handler(...)
                 """
             self.failUnlessMockTrackerMatch(expect_mock_output)
-            self.mock_tracker.out.truncate(0)
+            self.mock_tracker.clear()

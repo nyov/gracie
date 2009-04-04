@@ -261,7 +261,7 @@ class Test_Gracie(scaffold.TestCase):
                 ...""" % vars()
             instance.main()
             self.failUnlessMockTrackerMatch(expect_mock_output)
-            self.mock_tracker.out.truncate(0)
+            self.mock_tracker.clear()
 
     def test_main_calls_become_daemon(self):
         """ main() should attempt to become a daemon """
