@@ -53,10 +53,10 @@ build: doc
 man: ${manpage_files}
 
 %.1: %.1${RST_SUFFIX}
-	$(RST2MAN) < $< > $@
+	$(RST2MAN) "$<" "$@"
 
 %.8: %.8${RST_SUFFIX}
-	$(RST2MAN) < $< > $@
+	$(RST2MAN) "$<" "$@"
 
 
 .PHONY: xhtml
