@@ -7,7 +7,7 @@ local-authentication OpenID provider
 ------------------------------------
 
 :Author: |author|
-:Date: 2009-04-02
+:Date: 2009-05-08
 :Copyright: GNU General Public License, version 2 or later
 :Manual section: 8
 :Manual group: Gracie OpenID provider
@@ -61,16 +61,19 @@ The OpenID project page <http://openid.net/>_.
 HISTORY
 =======
 
-This manual page was written by |author| for the Debian system (but
-may be used by others).
+This manual page was written by |author|.
 
 ..  |author| replace:: |authorname| |authoremail|
 ..  |authorname| replace:: Ben Finney
-..  |authoremail| replace:: <ben+debian@benfinney.id.au>
+..  |authoremail| replace:: <ben+python@benfinney.id.au>
 
 ..
     Local variables:
     mode: rst
     coding: utf-8
+    time-stamp-format: "%:y-%02m-%02d"
+    time-stamp-start: "^:Date:[         ]+"
+    time-stamp-end: "$"
+    time-stamp-line-limit: 20
     End:
     vim: filetype=rst fileencoding=utf-8 :
