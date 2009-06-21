@@ -1,0 +1,50 @@
+2009-06-21  Ben Finney  <ben@benfinney.id.au>
+
+	Version 0.2.9 released.
+	
+	* Use external ‘python-daemon’ library for well-behaved daemon
+	implementation.
+
+2008-09-23  Ben Finney  <ben@benfinney.id.au>
+
+	Version 0.2.8 released.
+
+	* Improvements to package build configuration.
+
+2008-09-19  Ben Finney  <ben@benfinney.id.au>
+
+	Version 0.2.7 released.
+
+	* Use RFC2616 as definition of HTTP response status codes.
+	* Improvements to test suite.
+
+2007-10-17  Ben Finney  <ben@benfinney.id.au>
+
+	Version 0.2.6 released.
+
+	* Improvements to test suite.
+	* Improvements to packaging automation.
+
+2007-09-11  Ben Finney  <ben@benfinney.id.au>
+
+	Version 0.2.5 released.
+
+	* Document installation process and usage.
+	* Fix daemon program install location.
+
+2007-09-11  Ben Finney  <ben@benfinney.id.au>
+
+	Version 0.2.4 released.
+
+	* Improvements to test suite.
+	* Improvements to packaging automation.
+
+2007-03-28  Ben Finney  <ben@benfinney.id.au>
+
+	Version 0.2 released.
+
+	* Package using setuptools.
+
+2007-03-05  Ben Finney  <ben@benfinney.id.au>
+
+	* Initial work on OpenID server.
