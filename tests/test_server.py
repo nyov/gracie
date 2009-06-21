@@ -11,107 +11,12 @@
 """ Unit test for server module.
     """
 
-import __builtin__
-import sys
-import os
-from StringIO import StringIO
 import optparse
-import daemon
-from daemon import pidlockfile
 
 import scaffold
 from scaffold import Mock
 
 from gracie import server
-
-
-class become_daemon_TestCase(scaffold.TestCase):
-    """ Test cases for become_daemon function. """
-
-    def setUp(self):
-        """ Set up test fixtures. """
-        self.mock_tracker = scaffold.MockTracker()
-
-        self.mock_context = scaffold.Mock(
-            "DaemonContext",
-            tracker=self.mock_tracker)
-
-        # Ensure that using this object as a context manager will call
-        # the appropriate method.
-        self.mock_context.__enter__.mock_returns_func = (
-            self.mock_context.open)
-
-        scaffold.mock(
-            "daemon.DaemonContext",
-            returns=self.mock_context,
-            tracker=self.mock_tracker)
-
-        self.test_pidfile_name = "BoGuS_NaMe"
-        scaffold.mock(
-            "server.pidfile_name",
-            mock_obj=self.test_pidfile_name,
-            tracker=self.mock_tracker)
-
-        self.test_working_directory = "BoGuS_DiR"
-        scaffold.mock(
-            "os.getcwd",
-            returns=self.test_working_directory,
-            tracker=self.mock_tracker)
-
-        self.mock_lockfile = scaffold.Mock(
-            "PIDLockFile",
-            tracker=self.mock_tracker)
-
-        scaffold.mock(
-            "pidlockfile.PIDLockFile",
-            returns=self.mock_lockfile,
-            tracker=self.mock_tracker)
-
-    def tearDown(self):
-        """ Tear down test fixtures. """
-        scaffold.mock_restore()
-
-    def test_creates_pidlockfile(self):
-        """ Should create a PIDLockFile. """
-        pidfile_path = os.path.join(
-            self.test_working_directory, self.test_pidfile_name)
-        expect_mock_output = """\
-            ...
-            Called pidlockfile.PIDLockFile(%(pidfile_path)r)
-            ...""" % vars()
-        server.become_daemon()
-        self.failUnlessMockCheckerMatch(expect_mock_output)
-
-    def test_creates_daemon_context(self):
-        """ Should create a DaemonContext instance with expected args. """
-        expect_pidfile = self.mock_lockfile
-        expect_files_preserve = [
-            sys.stderr,
-            ]
-        expect_mock_output = """\
-            ...
-            Called daemon.DaemonContext(
-                files_preserve=%(expect_files_preserve)r,
-                pidfile=%(expect_pidfile)r)
-            ...""" % vars()
-        server.become_daemon()
-        scaffold.mock_restore()
-        self.failUnlessMockCheckerMatch(expect_mock_output)
-
-    def test_invokes_daemon_context_open(self):
-        """ Should invoke DaemonContext open method. """
-        expect_mock_output = """\
-            ...
-            Called DaemonContext.open()
-            """
-        server.become_daemon()
-        self.failUnlessMockCheckerMatch(expect_mock_output)
-
-    def test_returns_daemon_context(self):
-        """ Should return the DaemonContext instance. """
-        expect_context = self.mock_context
-        context = server.become_daemon()
-        self.failUnlessIs(expect_context, context)
 
 
 def stub_server_bind(server):

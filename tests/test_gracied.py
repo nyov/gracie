@@ -14,6 +14,8 @@
 import sys
 import os
 from StringIO import StringIO
+import daemon
+from daemon import pidlockfile
 
 import scaffold
 from scaffold import Mock
@@ -58,12 +60,7 @@ def setup_gracie_fixtures(testcase):
             tracker=testcase.mock_tracker),
         tracker=testcase.mock_tracker)
 
-    testcase.mock_context = object()
     scaffold.mock("gracied.default_port", mock_obj=7654)
-    scaffold.mock(
-        "gracied.become_daemon",
-        returns=testcase.mock_context,
-        tracker=testcase.mock_tracker)
 
     testcase.valid_apps = {
         'simple': dict(
@@ -119,6 +116,10 @@ class Gracie_TestCase(scaffold.TestCase):
     def setUp(self):
         """ Set up test fixtures. """
         setup_gracie_fixtures(self)
+
+        scaffold.mock(
+            "gracied.Gracie._become_daemon",
+            tracker=self.mock_tracker)
 
     def tearDown(self):
         """ Tear down test fixtures. """
@@ -244,6 +245,10 @@ class Gracie_main_TestCase(scaffold.TestCase):
         """ Set up test fixtures. """
         setup_gracie_fixtures(self)
 
+        scaffold.mock(
+            "gracied.Gracie._become_daemon",
+            tracker=self.mock_tracker)
+
     def tearDown(self):
         """ Tear down test fixtures. """
         scaffold.mock_restore()
@@ -283,25 +288,17 @@ class Gracie_main_TestCase(scaffold.TestCase):
             self.failUnlessMockCheckerMatch(expect_mock_output)
             self.mock_tracker.clear()
 
-    def test_calls_become_daemon(self):
+    def test_becomes_daemon(self):
         """ Should attempt to become a daemon. """
         params = self.valid_apps['simple']
         instance = params['instance']
         expect_mock_output = """\
             ...
-            Called gracied.become_daemon()
+            Called gracied.Gracie._become_daemon()
             ...
             """
         instance.main()
         self.failUnlessMockCheckerMatch(expect_mock_output)
-
-    def test_stores_daemon_context(self):
-        """ Should store daemon context as attribute of app. """
-        params = self.valid_apps['simple']
-        instance = params['instance']
-        expect_context = self.mock_context
-        instance.main()
-        self.failUnlessIs(expect_context, instance.daemon_context)
 
     def test_starts_server(self):
         """ Should start GracieServer if child fork. """
@@ -314,6 +311,103 @@ class Gracie_main_TestCase(scaffold.TestCase):
             """
         instance.main()
         self.failUnlessMockCheckerMatch(expect_mock_output)
+
+
+class Gracie_become_daemon_TestCase(scaffold.TestCase):
+    """ Test cases for Gracie._become_daemon method. """
+
+    def setUp(self):
+        """ Set up test fixtures. """
+        setup_gracie_fixtures(self)
+
+        self.mock_context = scaffold.Mock(
+            "DaemonContext",
+            tracker=self.mock_tracker)
+
+        # Ensure that using this object as a context manager will call
+        # the appropriate method.
+        self.mock_context.__enter__.mock_returns_func = (
+            self.mock_context.open)
+
+        scaffold.mock(
+            "daemon.DaemonContext",
+            returns=self.mock_context,
+            tracker=self.mock_tracker)
+
+        self.test_pidfile_name = "BoGuS_NaMe"
+        scaffold.mock(
+            "gracied.pidfile_name",
+            mock_obj=self.test_pidfile_name,
+            tracker=self.mock_tracker)
+
+        self.test_working_directory = "BoGuS_DiR"
+        scaffold.mock(
+            "os.getcwd",
+            returns=self.test_working_directory,
+            tracker=self.mock_tracker)
+
+        self.mock_lockfile = scaffold.Mock(
+            "PIDLockFile",
+            tracker=self.mock_tracker)
+
+        scaffold.mock(
+            "pidlockfile.PIDLockFile",
+            returns=self.mock_lockfile,
+            tracker=self.mock_tracker)
+
+    def tearDown(self):
+        """ Tear down test fixtures. """
+        scaffold.mock_restore()
+
+    def test_creates_pidlockfile(self):
+        """ Should create a PIDLockFile. """
+        params = self.valid_apps['simple']
+        instance = params['instance']
+        pidfile_path = os.path.join(
+            self.test_working_directory, self.test_pidfile_name)
+        expect_mock_output = """\
+            ...
+            Called pidlockfile.PIDLockFile(%(pidfile_path)r)
+            ...""" % vars()
+        instance._become_daemon()
+        self.failUnlessMockCheckerMatch(expect_mock_output)
+
+    def test_creates_daemon_context(self):
+        """ Should create a DaemonContext instance with expected args. """
+        params = self.valid_apps['simple']
+        instance = params['instance']
+        expect_pidfile = self.mock_lockfile
+        expect_files_preserve = [
+            sys.stderr,
+            ]
+        expect_mock_output = """\
+            ...
+            Called daemon.DaemonContext(
+                files_preserve=%(expect_files_preserve)r,
+                pidfile=%(expect_pidfile)r)
+            ...""" % vars()
+        instance._become_daemon()
+        scaffold.mock_restore()
+        self.failUnlessMockCheckerMatch(expect_mock_output)
+
+    def test_invokes_daemon_context_open(self):
+        """ Should invoke DaemonContext open method. """
+        params = self.valid_apps['simple']
+        instance = params['instance']
+        expect_mock_output = """\
+            ...
+            Called DaemonContext.open()
+            """
+        instance._become_daemon()
+        self.failUnlessMockCheckerMatch(expect_mock_output)
+
+    def test_stores_daemon_context(self):
+        """ Should store daemon context as attribute of app. """
+        params = self.valid_apps['simple']
+        instance = params['instance']
+        expect_context = self.mock_context
+        instance._become_daemon()
+        self.failUnlessIs(expect_context, instance.daemon_context)
 
 
 class ProgramMain_TestCase(scaffold.ProgramMain_TestCase):

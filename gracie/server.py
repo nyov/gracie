@@ -1,23 +1,19 @@
 # -*- coding: utf-8 -*-
 
 # gracie/server.py
-# Part of Gracie, an OpenID provider
+# Part of Gracie, an OpenID provider.
 #
 # Copyright © 2007–2009 Ben Finney <ben+python@benfinney.id.au>
 # This is free software; you may copy, modify and/or distribute this work
 # under the terms of the GNU General Public License, version 2 or later.
 # No warranty expressed or implied. See the file LICENSE for details.
 
-""" Behaviour for OpenID provider server
-"""
+""" Behaviour for OpenID provider server.
+    """
 
-import sys
-import os
 import logging
 from openid.server.server import Server as OpenIDServer
 from openid.store.filestore import FileOpenIDStore as OpenIDStore
-import daemon
-from daemon import pidlockfile
 
 from httprequest import HTTPRequestHandler
 from httpserver import HTTPServer
@@ -28,21 +24,6 @@ import version
 
 # Get the Python logging instance for this module
 _logger = logging.getLogger("gracie.server")
-
-
-pidfile_name = "gracied.pid"
-
-def become_daemon():
-    """ Detach the current process and run as a daemon. """
-    pidfile_path = os.path.join(os.getcwd(), pidfile_name)
-    pidfile = pidlockfile.PIDLockFile(pidfile_path)
-    files_preserve = [sys.stderr]
-    daemon_context = daemon.DaemonContext(
-        files_preserve=files_preserve,
-        pidfile=pidfile,
-        )
-    daemon_context.open()
-    return daemon_context
 
 
 class GracieServer(object):
