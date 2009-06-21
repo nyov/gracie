@@ -37,85 +37,91 @@ class Stub_GracieServer(object):
         pass
 
 
+def setup_gracie_fixtures(testcase):
+    """ Set up fixtures for Gracie test cases. """
+    testcase.mock_tracker = scaffold.MockTracker()
+
+    testcase.app_class = gracied.Gracie
+
+    testcase.stdout_test = StringIO()
+    scaffold.mock("sys.stdout", mock_obj=testcase.stdout_test)
+
+    scaffold.mock(
+        "gracied.OptionParser.error",
+        raises=SystemExit,
+        tracker=testcase.mock_tracker)
+
+    scaffold.mock(
+        "gracied.GracieServer",
+        returns=Mock(
+            "gracied.GracieServer",
+            tracker=testcase.mock_tracker),
+        tracker=testcase.mock_tracker)
+
+    testcase.mock_context = object()
+    scaffold.mock("gracied.default_port", mock_obj=7654)
+    scaffold.mock(
+        "gracied.become_daemon",
+        returns=testcase.mock_context,
+        tracker=testcase.mock_tracker)
+
+    testcase.valid_apps = {
+        'simple': dict(
+            ),
+        'argv_loglevel_debug': dict(
+            options = ["--log-level", "debug"],
+            ),
+        'change-host': dict(
+            options = ["--host", "frobnitz"],
+            host = "frobnitz",
+            ),
+        'change-port': dict(
+            options = ["--port", "9779"],
+            port = 9779,
+            ),
+        'change-address': dict(
+            options = ["--host", "frobnitz", "--port", "9779"],
+            host = "frobnitz",
+            port = 9779,
+            ),
+        'change-root-url': dict(
+            options = ["--root-url", "http://spudnik/spam"],
+            root_url = "http://spudnik/spam",
+            ),
+        'change-address-and-root-url': dict(
+            options = [
+                "--host", "frobnitz", "--port", "9779",
+                "--root-url", "http://spudnik/spam",
+                ],
+            host = "frobnitz",
+            port = 9779,
+            root_url = "http://frobnitz/spam",
+            ),
+        }
+
+    for key, params in testcase.valid_apps.items():
+        argv = ["progname"]
+        options = params.get('options', None)
+        if options:
+            argv.extend(options)
+        params['argv'] = argv
+        args = dict(
+            argv=argv
+            )
+        params['args'] = args
+        instance = testcase.app_class(**args)
+        params['instance'] = instance
+
+
 class Gracie_TestCase(scaffold.TestCase):
     """ Test cases for Gracie class. """
+
     def setUp(self):
-        """ Set up test fixtures """
-        self.mock_tracker = scaffold.MockTracker()
-
-        self.app_class = gracied.Gracie
-
-        self.stdout_test = StringIO()
-        scaffold.mock("sys.stdout", mock_obj=self.stdout_test)
-
-        scaffold.mock(
-            "gracied.OptionParser.error",
-            raises=SystemExit,
-            tracker=self.mock_tracker)
-
-        scaffold.mock(
-            "gracied.GracieServer",
-            returns=Mock(
-                "gracied.GracieServer",
-                tracker=self.mock_tracker),
-            tracker=self.mock_tracker)
-
-        self.mock_context = object()
-        scaffold.mock("gracied.default_port", mock_obj=7654)
-        scaffold.mock(
-            "gracied.become_daemon",
-            returns=self.mock_context,
-            tracker=self.mock_tracker)
-
-        self.valid_apps = {
-            'simple': dict(
-                ),
-            'argv_loglevel_debug': dict(
-                options = ["--log-level", "debug"],
-                ),
-            'change-host': dict(
-                options = ["--host", "frobnitz"],
-                host = "frobnitz",
-                ),
-            'change-port': dict(
-                options = ["--port", "9779"],
-                port = 9779,
-                ),
-            'change-address': dict(
-                options = ["--host", "frobnitz", "--port", "9779"],
-                host = "frobnitz",
-                port = 9779,
-                ),
-            'change-root-url': dict(
-                options = ["--root-url", "http://spudnik/spam"],
-                root_url = "http://spudnik/spam",
-                ),
-            'change-address-and-root-url': dict(
-                options = [
-                    "--host", "frobnitz", "--port", "9779",
-                    "--root-url", "http://spudnik/spam",
-                    ],
-                host = "frobnitz",
-                port = 9779,
-                root_url = "http://frobnitz/spam",
-                ),
-            }
-
-        for key, params in self.valid_apps.items():
-            argv = ["progname"]
-            options = params.get('options', None)
-            if options:
-                argv.extend(options)
-            params['argv'] = argv
-            args = dict(
-                argv=argv
-                )
-            params['args'] = args
-            instance = self.app_class(**args)
-            params['instance'] = instance
+        """ Set up test fixtures. """
+        setup_gracie_fixtures(self)
 
     def tearDown(self):
-        """ Tear down test fixtures """
+        """ Tear down test fixtures. """
         scaffold.mock_restore()
 
     def test_instantiate(self):
@@ -230,8 +236,20 @@ class Gracie_TestCase(scaffold.TestCase):
         instance = self.app_class(**args)
         self.failUnlessEqual(want_url, instance.opts.root_url)
 
-    def test_main_instantiates_server(self):
-        """ main() should create a new server instance """
+
+class Gracie_main_TestCase(scaffold.TestCase):
+    """ Test cases for Gracie.main method. """
+
+    def setUp(self):
+        """ Set up test fixtures. """
+        setup_gracie_fixtures(self)
+
+    def tearDown(self):
+        """ Tear down test fixtures. """
+        scaffold.mock_restore()
+
+    def test_instantiates_server(self):
+        """ Should create a new server instance. """
         params = self.valid_apps['simple']
         instance = params['instance']
         host = gracied.default_host
@@ -245,8 +263,8 @@ class Gracie_TestCase(scaffold.TestCase):
         self.failUnlessMockCheckerMatch(expect_mock_output)
         self.failIfIs(instance.server, None)
 
-    def test_main_sets_specified_socket_params(self):
-        """ main() should set the server on the specified host:port """
+    def test_sets_specified_socket_params(self):
+        """ Should set the server on the specified host:port. """
         for params in self.valid_apps.values():
             instance = params['instance']
             default_address = (
@@ -265,8 +283,8 @@ class Gracie_TestCase(scaffold.TestCase):
             self.failUnlessMockCheckerMatch(expect_mock_output)
             self.mock_tracker.clear()
 
-    def test_main_calls_become_daemon(self):
-        """ main() should attempt to become a daemon """
+    def test_calls_become_daemon(self):
+        """ Should attempt to become a daemon. """
         params = self.valid_apps['simple']
         instance = params['instance']
         expect_mock_output = """\
@@ -277,7 +295,7 @@ class Gracie_TestCase(scaffold.TestCase):
         instance.main()
         self.failUnlessMockCheckerMatch(expect_mock_output)
 
-    def test_main_stores_daemon_context(self):
+    def test_stores_daemon_context(self):
         """ Should store daemon context as attribute of app. """
         params = self.valid_apps['simple']
         instance = params['instance']
@@ -285,8 +303,8 @@ class Gracie_TestCase(scaffold.TestCase):
         instance.main()
         self.failUnlessIs(expect_context, instance.daemon_context)
 
-    def test_main_starts_server(self):
-        """ main() should start GracieServer if child fork """
+    def test_starts_server(self):
+        """ Should start GracieServer if child fork. """
         params = self.valid_apps['simple']
         instance = params['instance']
         port = gracied.default_port
