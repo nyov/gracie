@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # tests/test_server.py
-# Part of Gracie, an OpenID provider
+# Part of Gracie, an OpenID provider.
 #
 # Copyright © 2007–2009 Ben Finney <ben+python@benfinney.id.au>
 # This is free software; you may copy, modify and/or distribute this work
@@ -14,7 +14,6 @@
 import optparse
 
 import scaffold
-from scaffold import Mock
 
 from gracie import server
 
