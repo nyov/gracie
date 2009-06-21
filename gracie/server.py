@@ -3,7 +3,7 @@
 # gracie/server.py
 # Part of Gracie, an OpenID provider
 #
-# Copyright © 2007-2008 Ben Finney <ben+python@benfinney.id.au>
+# Copyright © 2007–2009 Ben Finney <ben+python@benfinney.id.au>
 # This is free software; you may copy, modify and/or distribute this work
 # under the terms of the GNU General Public License, version 2 or later.
 # No warranty expressed or implied. See the file LICENSE for details.
@@ -16,6 +16,7 @@ import os
 import logging
 from openid.server.server import Server as OpenIDServer
 from openid.store.filestore import FileOpenIDStore as OpenIDStore
+import daemon
 
 from httprequest import HTTPRequestHandler
 from httpserver import HTTPServer
@@ -49,35 +50,9 @@ def remove_pid_file():
     os.remove(pidfile_name)
 
 def become_daemon():
-    """ Detach the current process and run as a daemon """
-    # This technique cribbed from Chad J. Schroeder,
-    # <URL:http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/278731>
+    """ Detach the current process and run as a daemon. """
 
-    pid = os.fork()
-    if pid == 0:
-        # This is the child of the first fork, so we are now in the
-        # background.
-
-        # Set a new process group
-        os.setsid()
-
-        pid = os.fork()
-        if pid == 0:
-            # This is the parent of the new process group, and is
-            # orphaned from the original parent process. Good.
-            pass
-        else:
-            # This is the child of the second fork, so we want to exit
-            # orphaning the true process to run by itself.
-            os._exit(os.EX_OK)
-    else:
-        # This is the parent process of the first fork
-        # so we want to exit, leaving only the child to run
-        os._exit(os.EX_OK)
-
-    create_pid_file(pid)
-
-    remove_standard_files()
+    daemon.DaemonContext()
 
 
 class GracieServer(object):

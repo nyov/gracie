@@ -16,6 +16,7 @@ import sys
 import os
 from StringIO import StringIO
 import optparse
+import daemon
 
 import scaffold
 from scaffold import Mock
@@ -23,192 +24,25 @@ from scaffold import Mock
 from gracie import server
 
 
-class remove_standard_files_TestCase(scaffold.TestCase):
-    """ Test cases for remove_standard_files function. """
-
-    def setUp(self):
-        """ Set up test fixtures """
-        self.mock_tracker = scaffold.MockTracker()
-
-        scaffold.mock(
-            "sys.stdin", tracker=self.mock_tracker)
-        scaffold.mock(
-            "sys.stdout", tracker=self.mock_tracker)
-        scaffold.mock(
-            "sys.stderr", tracker=self.mock_tracker)
-
-    def tearDown(self):
-        """ Tear down test fixtures """
-        scaffold.mock_restore()
-
-
-class create_pid_file_TestCase(scaffold.TestCase):
-    """ Test cases for create_pid_file function. """
-
-    def setUp(self):
-        """ Set up test fixtures """
-        self.mock_tracker = scaffold.MockTracker()
-
-        self.mock_pidfile = StringIO()
-        scaffold.mock(
-            "__builtin__.open",
-            returns=self.mock_pidfile,
-            tracker=self.mock_tracker)
-
-    def tearDown(self):
-        """ Tear down test fixtures """
-        scaffold.mock_restore()
-
-    def test_creates_file(self):
-        """ Should create the file """
-        pid = 23
-        pidfile_name = "gracied.pid"
-        expect_mock_output = """\
-            Called __builtin__.open(%(pidfile_name)r, ...)
-            """ % vars()
-        server.create_pid_file(pid)
-        scaffold.mock_restore()
-        self.failUnlessMockCheckerMatch(expect_mock_output)
-
-    def test_writes_pid_to_file(self):
-        """ Should write the specified PID in the correct format """
-        pid = 23
-        expect_pidfile_content = "%(pid)d\n" % vars()
-        server.create_pid_file(pid)
-        scaffold.mock_restore()
-        self.failUnlessEqual(
-            expect_pidfile_content, self.mock_pidfile.getvalue()
-            )
-
-
-class remove_pid_file_TestCase(scaffold.TestCase):
-    """ Test cases for remove_pid_file function. """
-
-    def setUp(self):
-        """ Set up test fixtures """
-        self.mock_tracker = scaffold.MockTracker()
-
-        scaffold.mock(
-            "os.remove",
-            tracker=self.mock_tracker)
-
-    def tearDown(self):
-        """ Tear down test fixtures """
-        scaffold.mock_restore()
-
-    def test_removes_expected_file(self):
-        """ Should remove the expected file """
-        mock_pidfile = "gracied.pid"
-        expect_mock_output = """\
-            Called os.remove(%(mock_pidfile)r)
-            """ % vars()
-        server.remove_pid_file()
-        self.failUnlessMockCheckerMatch(expect_mock_output)
-
-
 class become_daemon_TestCase(scaffold.TestCase):
     """ Test cases for become_daemon function. """
 
     def setUp(self):
-        """ Set up test fixtures """
+        """ Set up test fixtures. """
         self.mock_tracker = scaffold.MockTracker()
 
-        test_pids = [0, 0]
         scaffold.mock(
-            "os.fork", returns_iter=test_pids,
-            tracker=self.mock_tracker)
-        scaffold.mock(
-            "os.setsid",
-            tracker=self.mock_tracker)
-        scaffold.mock(
-            "os._exit",
-            tracker=self.mock_tracker)
-        scaffold.mock(
-            "sys.exit",
-            tracker=self.mock_tracker)
-        scaffold.mock(
-            "server.create_pid_file",
-            tracker=self.mock_tracker)
-        scaffold.mock(
-            "server.remove_standard_files",
+            "daemon.DaemonContext",
             tracker=self.mock_tracker)
 
     def tearDown(self):
-        """ Tear down test fixtures """
+        """ Tear down test fixtures. """
         scaffold.mock_restore()
 
-    def test_parent_exits(self):
-        """ become_daemon parent process should exit """
-        parent_pid = 23
-        scaffold.mock(
-            "os.fork", returns_iter=[parent_pid],
-            tracker=self.mock_tracker)
+    def test_creates_daemon_context(self):
+        """ Should create a DaemonContext instance. """
         expect_mock_output = """\
-            Called os.fork()
-            Called os._exit(0)
-            ...
-            """
-        server.become_daemon()
-        self.failUnlessMockCheckerMatch(expect_mock_output)
-
-    def test_child_starts_new_process_group(self):
-        """ become_daemon child should start new process group """
-        expect_mock_output = """\
-            Called os.fork()
-            Called os.setsid()
-            ...
-            """
-        server.become_daemon()
-        self.failUnlessMockCheckerMatch(expect_mock_output)
-
-    def test_child_forks_next_parent_exits(self):
-        """ become_daemon should fork, then exit if parent """
-        test_pids = [0, 42]
-        scaffold.mock(
-            "os.fork", returns_iter=test_pids,
-            tracker=self.mock_tracker)
-        expect_mock_output = """\
-            Called os.fork()
-            Called os.setsid()
-            Called os.fork()
-            Called os._exit(0)
-            ...
-            """
-        server.become_daemon()
-        self.failUnlessMockCheckerMatch(expect_mock_output)
-
-    def test_child_forks_next_child_continues(self):
-        """ become_daemon should fork, then continue if child """
-        expect_mock_output = """\
-            Called os.fork()
-            Called os.setsid()
-            Called os.fork()
-            Called server.create_pid_file(...)
-            ...
-            """
-        server.become_daemon()
-        self.failUnlessMockCheckerMatch(expect_mock_output)
-
-    def test_creates_pid_file_with_own_pid(self):
-        """ Should request creation of a PID file with its own PID """
-        daemon_pid = 13
-        test_pids = [0, daemon_pid]
-        scaffold.mock(
-            "os.fork", returns_iter=test_pids,
-            tracker=self.mock_tracker)
-        expect_mock_output = """\
-            ...
-            Called server.create_pid_file(%(daemon_pid)r)
-            ...
-            """ % vars()
-        server.become_daemon()
-        self.failUnlessMockCheckerMatch(expect_mock_output)
-
-    def test_removes_standard_files(self):
-        """ become_daemon should request removal of standard files """
-        expect_mock_output = """\
-            ...
-            Called server.remove_standard_files()
+            Called daemon.DaemonContext()
             """
         server.become_daemon()
         self.failUnlessMockCheckerMatch(expect_mock_output)
