@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 
 # gracie/version/__init__.py
-# Part of Gracie, an OpenID provider
+# Part of Gracie, an OpenID provider.
 #
-# Copyright © 2008 Ben Finney <ben+python@benfinney.id.au>
+# Copyright © 2008–2009 Ben Finney <ben+python@benfinney.id.au>
 # This is free software; you may copy, modify and/or distribute this work
 # under the terms of the GNU General Public License, version 2 or later.
 # No warranty expressed or implied. See the file LICENSE for details.
 
-""" Version information for the Gracie package """
+""" Version information for the Gracie package. """
 
 from version_info import version_info
 
-version_info['version_string'] = "0.2.9"
+version_info['version_string'] = "0.2.10"
 
 version_short = "%(version_string)s" % version_info
 version_full = "%(version_string)s.r%(revno)s" % version_info
