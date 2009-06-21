@@ -2,23 +2,29 @@
 # -*- coding: utf-8 -*-
 
 # gracie
-# Part of Gracie, an OpenID provider
+# Part of Gracie, an OpenID provider.
 #
-# Copyright © 2007..2008 Ben Finney <ben+python@benfinney.id.au>
+# Copyright © 2007–2009 Ben Finney <ben+python@benfinney.id.au>
 # This is free software; you may copy, modify and/or distribute this work
 # under the terms of the GNU General Public License, version 2 or later.
 # No warranty expressed or implied. See the file LICENSE for details.
 
-""" Application behaviour for Gracie
-"""
+""" Application behaviour for Gracie.
+    """
 
+import sys
+import os.path
 import optparse
 import logging
+import daemon
+from daemon import pidlockfile
 
-from gracie.server import become_daemon
 from gracie import version
 from gracie.server import GracieServer
 from gracie.httpserver import default_host, default_port, default_root_url
+
+
+pidfile_name = "gracied.pid"
 
 
 class OptionParser(optparse.OptionParser):
@@ -113,12 +119,23 @@ class Gracie(object):
         params = (self.opts.host, self.opts.port)
         return params
 
+    def _become_daemon(self):
+        """ Turn the running program into a daemon process. """
+        pidfile_path = os.path.join(os.getcwd(), pidfile_name)
+        pidfile = pidlockfile.PIDLockFile(pidfile_path)
+        files_preserve = [sys.stderr]
+        self.daemon_context = daemon.DaemonContext(
+            files_preserve=files_preserve,
+            pidfile=pidfile,
+            )
+        self.daemon_context.open()
+
     def main(self):
         """ Run the Gracie application """
         socket_params = self._get_socket_params()
         self.server = GracieServer(socket_params, self.opts)
 
-        become_daemon()
+        self._become_daemon()
         self.server.serve_forever()
 
 

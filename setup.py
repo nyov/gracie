@@ -43,6 +43,7 @@ setup(
     zip_safe = False,
     test_suite = "tests.suite",
     install_requires = [
+        "python-daemon >= 1.4.5",
         "python-openid >= 1.2",
         "Routes >= 1.6.3",
         ],
