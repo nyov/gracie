@@ -11,6 +11,8 @@
 """ Behaviour for OpenID provider server
 """
 
+import sys
+import os
 import logging
 from openid.server.server import Server as OpenIDServer
 from openid.store.filestore import FileOpenIDStore as OpenIDStore
@@ -32,8 +34,11 @@ pidfile_name = "gracied.pid"
 
 def become_daemon():
     """ Detach the current process and run as a daemon. """
-    pidfile = pidlockfile.PIDLockFile(pidfile_name)
+    pidfile_path = os.path.join(os.getcwd(), pidfile_name)
+    pidfile = pidlockfile.PIDLockFile(pidfile_path)
+    files_preserve = [sys.stderr]
     daemon_context = daemon.DaemonContext(
+        files_preserve=files_preserve,
         pidfile=pidfile,
         )
     daemon_context.open()
