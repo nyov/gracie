@@ -107,6 +107,12 @@ class become_daemon_TestCase(scaffold.TestCase):
         server.become_daemon()
         self.failUnlessMockCheckerMatch(expect_mock_output)
 
+    def test_returns_daemon_context(self):
+        """ Should return the DaemonContext instance. """
+        expect_context = self.mock_context
+        context = server.become_daemon()
+        self.failUnlessIs(expect_context, context)
+
 
 def stub_server_bind(server):
     """ Stub method to get server location """

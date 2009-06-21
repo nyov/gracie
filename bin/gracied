@@ -118,7 +118,7 @@ class Gracie(object):
         socket_params = self._get_socket_params()
         self.server = GracieServer(socket_params, self.opts)
 
-        become_daemon()
+        self.daemon_context = become_daemon()
         self.server.serve_forever()
 
 

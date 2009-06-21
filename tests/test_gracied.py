@@ -60,9 +60,11 @@ class Gracie_TestCase(scaffold.TestCase):
                 tracker=self.mock_tracker),
             tracker=self.mock_tracker)
 
+        self.mock_context = object()
         scaffold.mock("gracied.default_port", mock_obj=7654)
         scaffold.mock(
             "gracied.become_daemon",
+            returns=self.mock_context,
             tracker=self.mock_tracker)
 
         self.valid_apps = {
@@ -274,6 +276,14 @@ class Gracie_TestCase(scaffold.TestCase):
             """
         instance.main()
         self.failUnlessMockCheckerMatch(expect_mock_output)
+
+    def test_main_stores_daemon_context(self):
+        """ Should store daemon context as attribute of app. """
+        params = self.valid_apps['simple']
+        instance = params['instance']
+        expect_context = self.mock_context
+        instance.main()
+        self.failUnlessIs(expect_context, instance.daemon_context)
 
     def test_main_starts_server(self):
         """ main() should start GracieServer if child fork """

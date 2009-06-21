@@ -42,6 +42,7 @@ def become_daemon():
         pidfile=pidfile,
         )
     daemon_context.open()
+    return daemon_context
 
 
 class GracieServer(object):
