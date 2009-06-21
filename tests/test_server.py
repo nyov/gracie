@@ -17,6 +17,7 @@ import os
 from StringIO import StringIO
 import optparse
 import daemon
+from daemon import pidlockfile
 
 import scaffold
 from scaffold import Mock
@@ -45,16 +46,43 @@ class become_daemon_TestCase(scaffold.TestCase):
             returns=self.mock_context,
             tracker=self.mock_tracker)
 
+        self.test_pidfile_name = object()
+        self.test_pidfile_path = object()
+        scaffold.mock(
+            "server.pidfile_name",
+            mock_obj=self.test_pidfile_name,
+            tracker=self.mock_tracker)
+
+        self.mock_lockfile = scaffold.Mock(
+            "PIDLockFile",
+            tracker=self.mock_tracker)
+
+        scaffold.mock(
+            "pidlockfile.PIDLockFile",
+            returns=self.mock_lockfile,
+            tracker=self.mock_tracker)
+
     def tearDown(self):
         """ Tear down test fixtures. """
         scaffold.mock_restore()
 
-    def test_creates_daemon_context(self):
-        """ Should create a DaemonContext instance. """
+    def test_creates_pidlockfile(self):
+        """ Should create a PIDLockFile. """
+        pidfile_path = self.test_pidfile_name
         expect_mock_output = """\
-            Called daemon.DaemonContext()
+            Called pidlockfile.PIDLockFile(%(pidfile_path)r)
+            ...""" % vars()
+        server.become_daemon()
+        self.failUnlessMockCheckerMatch(expect_mock_output)
+
+    def test_creates_daemon_context(self):
+        """ Should create a DaemonContext instance with expected args. """
+        test_pidfile = self.mock_lockfile
+        expect_mock_output = """\
             ...
-            """
+            Called daemon.DaemonContext(
+                pidfile=%(test_pidfile)r)
+            ...""" % vars()
         server.become_daemon()
         self.failUnlessMockCheckerMatch(expect_mock_output)
 

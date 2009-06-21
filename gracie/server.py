@@ -11,11 +11,11 @@
 """ Behaviour for OpenID provider server
 """
 
-import os
 import logging
 from openid.server.server import Server as OpenIDServer
 from openid.store.filestore import FileOpenIDStore as OpenIDStore
 import daemon
+from daemon import pidlockfile
 
 from httprequest import HTTPRequestHandler
 from httpserver import HTTPServer
@@ -30,18 +30,12 @@ _logger = logging.getLogger("gracie.server")
 
 pidfile_name = "gracied.pid"
 
-def create_pid_file(pid):
-    """ Create a PID file with the specified process ID """
-    pidfile = open(pidfile_name, 'w')
-    pidfile.write("%(pid)d\n" % vars())
-
-def remove_pid_file():
-    """ Remove the PID file for this daemon """
-    os.remove(pidfile_name)
-
 def become_daemon():
     """ Detach the current process and run as a daemon. """
-    daemon_context = daemon.DaemonContext()
+    pidfile = pidlockfile.PIDLockFile(pidfile_name)
+    daemon_context = daemon.DaemonContext(
+        pidfile=pidfile,
+        )
     daemon_context.open()
 
 
