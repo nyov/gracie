@@ -11,7 +11,6 @@
 """ Behaviour for OpenID provider server
 """
 
-import sys
 import os
 import logging
 from openid.server.server import Server as OpenIDServer
@@ -29,15 +28,6 @@ import version
 _logger = logging.getLogger("gracie.server")
 
 
-def remove_standard_files():
-    """ Close stdin, redirect stdout & stderr to null """
-    class NullDevice:
-        def write(self, s):
-            pass
-    sys.stdin.close()
-    sys.stdout = NullDevice()
-    sys.stderr = NullDevice()
-
 pidfile_name = "gracied.pid"
 
 def create_pid_file(pid):
@@ -51,8 +41,8 @@ def remove_pid_file():
 
 def become_daemon():
     """ Detach the current process and run as a daemon. """
-
-    daemon.DaemonContext()
+    daemon_context = daemon.DaemonContext()
+    daemon_context.open()
 
 
 class GracieServer(object):

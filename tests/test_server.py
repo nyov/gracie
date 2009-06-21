@@ -31,8 +31,18 @@ class become_daemon_TestCase(scaffold.TestCase):
         """ Set up test fixtures. """
         self.mock_tracker = scaffold.MockTracker()
 
+        self.mock_context = scaffold.Mock(
+            "DaemonContext",
+            tracker=self.mock_tracker)
+
+        # Ensure that using this object as a context manager will call
+        # the appropriate method.
+        self.mock_context.__enter__.mock_returns_func = (
+            self.mock_context.open)
+
         scaffold.mock(
             "daemon.DaemonContext",
+            returns=self.mock_context,
             tracker=self.mock_tracker)
 
     def tearDown(self):
@@ -43,6 +53,16 @@ class become_daemon_TestCase(scaffold.TestCase):
         """ Should create a DaemonContext instance. """
         expect_mock_output = """\
             Called daemon.DaemonContext()
+            ...
+            """
+        server.become_daemon()
+        self.failUnlessMockCheckerMatch(expect_mock_output)
+
+    def test_invokes_daemon_context_open(self):
+        """ Should invoke DaemonContext open method. """
+        expect_mock_output = """\
+            ...
+            Called DaemonContext.open()
             """
         server.become_daemon()
         self.failUnlessMockCheckerMatch(expect_mock_output)
