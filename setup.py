@@ -70,3 +70,10 @@ setup(
         "Intended Audience :: System Administrators",
         ],
     )
+
+
+# Local variables:
+# mode: python
+# coding: utf-8
+# End:
+# vim: filetype=python fileencoding=utf-8 :
