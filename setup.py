@@ -27,37 +27,38 @@ short_description, long_description = (
 
 
 setup(
-    name = main_module_name,
-    version = version.version,
-    packages = find_packages(
-        exclude = ['tests'],
+    name=main_module_name,
+    version=version.version,
+    packages=find_packages(
+        exclude=['tests'],
         ),
-    scripts = [
+    scripts=[
         "bin/gracied",
         ],
 
     # setuptools metadata
-    zip_safe = False,
-    test_suite = "tests.suite",
-    install_requires = [
+    zip_safe=False,
+    test_suite="tests.suite",
+    install_requires=[
         "setuptools",
         "python-daemon >= 1.4.5",
         "python-openid >= 1.2",
         "Routes >= 1.6.3",
         ],
-    tests_require = [
+    tests_require=[
         "MiniMock >= 1.2.2",
         ],
 
     # PyPI metadata
-    author = version.author_name,
-    author_email = version.author_email,
-    description = short_description,
-    license = version.license,
-    keywords = "gracie openid identity authentication provider",
-    url = main_module._url,
-    long_description = long_description,
-    classifiers = [
+    author=version.author_name,
+    author_email=version.author_email,
+    description=short_description,
+    license=version.license,
+    keywords="gracie openid identity authentication provider",
+    url=main_module._url,
+    long_description=long_description,
+    classifiers=[
+        # Reference: http://pypi.python.org/pypi?%3Aaction=list_classifiers
         "Development Status :: 3 - Alpha",
         "License :: OSI Approved :: GNU General Public License (GPL)",
         "Programming Language :: Python",
