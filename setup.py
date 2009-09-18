@@ -14,9 +14,6 @@
 
 import textwrap
 
-import ez_setup
-ez_setup.use_setuptools()
-
 from setuptools import setup, find_packages
 
 main_module_name = 'gracie'
@@ -43,6 +40,7 @@ setup(
     zip_safe = False,
     test_suite = "tests.suite",
     install_requires = [
+        "setuptools",
         "python-daemon >= 1.4.5",
         "python-openid >= 1.2",
         "Routes >= 1.6.3",
