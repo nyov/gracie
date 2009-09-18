@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # bin/make-dist-tarball
-# Part of Gracie, an OpenID provider
+# Part of Gracie, an OpenID provider.
 #
 # Copyright © 2007–2009 Ben Finney <ben+python@benfinney.id.au>
 #
@@ -12,7 +12,7 @@
 # at your option, any later version.
 # No warranty expressed or implied. See the file LICENSE for details.
 
-""" Create the distribution tarball from VCS """
+""" Create the distribution tarball from VCS. """
 
 import os
 import sys

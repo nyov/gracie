@@ -8,7 +8,7 @@
 # No warranty expressed or implied. See the file LICENSE for details.
 
 """ Scaffolding for unit test modules.
-"""
+    """
 
 import unittest
 import doctest

@@ -8,7 +8,7 @@ A simple OpenID provider for local system accounts
 ==================================================
 
 :Author:    Ben Finney <ben+openid@benfinney.id.au>
-:Updated:   2007-03-05
+:Updated:   2009-09-18
 
 Gracie is an `OpenID`_ provider which authenticates users against
 local Unix system accounts.
@@ -73,7 +73,7 @@ PAM system::
 Copyright and License
 ---------------------
 
-Gracie is copyright © 2007 Ben Finney <ben+openid@benfinney.id.au>.
+Gracie is copyright © 2007–2009 Ben Finney <ben+openid@benfinney.id.au>.
 
 This is free software; you may copy, modify and/or distribute this
 work under the terms of the `GNU General Public License`_, version 2
