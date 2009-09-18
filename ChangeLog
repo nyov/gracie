@@ -1,7 +1,7 @@
 2009-06-21  Ben Finney  <ben@benfinney.id.au>
 
 	Version 0.2.9 released.
-	
+
 	* Use external ‘python-daemon’ library for well-behaved daemon
 	implementation.
 
