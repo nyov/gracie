@@ -16,18 +16,19 @@ import textwrap
 
 from setuptools import setup, find_packages
 
+distribution_name = "gracie"
 main_module_name = 'gracie'
 main_module = __import__(main_module_name, fromlist=['version'])
 version = main_module.version
 
 short_description, long_description = (
-    textwrap.dedent(d).strip()
-    for d in main_module.__doc__.split('\n\n', 1)
+    textwrap.dedent(desc).strip()
+    for desc in main_module.__doc__.split('\n\n', 1)
     )
 
 
 setup(
-    name=main_module_name,
+    name=distribution_name,
     version=version.version,
     packages=find_packages(
         exclude=['tests'],
