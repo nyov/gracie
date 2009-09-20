@@ -19,12 +19,9 @@ PYTHON_SETUP := $(PYTHON) ${PYTHON_SETUP_SCRIPT}
 
 PYTHON_BDIST_TARGETS := bdist_egg
 
-GENERATED_FILES += ${MODULE_DIR}/MANIFEST.in
 GENERATED_FILES += ${MODULE_DIR}/*.egg-info
 GENERATED_FILES += ${MODULE_DIR}/build/
 GENERATED_FILES += ${MODULE_DIR}/dist/
-
-VCS_INVENTORY ?= bzr inventory
 
 
 .PHONY: setuptools-register
@@ -68,12 +65,6 @@ ${PYTHON_BDIST_TARGETS}:
 .PHONY: setuptools-sdist
 setuptools-sdist: MANIFEST.in
 	$(PYTHON_SETUP) sdist
-
-MANIFEST.in:
-	( \
-		$(VCS_INVENTORY) \
-		| sed -e 's/^/include /' \
-	) > $@
 
 
 .PHONY: setuptools-clean
