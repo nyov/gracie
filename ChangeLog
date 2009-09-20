@@ -4,7 +4,7 @@
 	* Use distutils convention ‘test’ name for unit test directory.
 	* Use conventional ‘LICENSE.GPL-2’ name for that file.
 	* Provide a ‘README.txt’ symlink so distutils finds it in the top
-	directory.
+	  directory.
 	* Allow built distutils files to remain during ‘clean’ operation.
 
 2009-06-21  Ben Finney  <ben@benfinney.id.au>
@@ -12,7 +12,7 @@
 	Version 0.2.9 released.
 
 	* Use external ‘python-daemon’ library for well-behaved daemon
-	implementation.
+	  implementation.
 
 2008-09-23  Ben Finney  <ben@benfinney.id.au>
 
