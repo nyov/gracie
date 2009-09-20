@@ -2,6 +2,6 @@ include setup.py MANIFEST.in
 include doc/README.txt doc/LICENSE ChangeLog
 include Makefile setuptools.mk
 include gracie/module.mk
-include tests/module.mk
+include test/module.mk
 recursive-include bin *
 recursive-include doc *

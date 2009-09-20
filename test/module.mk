@@ -1,4 +1,4 @@
-# tests/module.mk
+# test/module.mk
 # Part of Gracie, an OpenID provider.
 #
 # Copyright © 2007–2009 Ben Finney <ben+python@benfinney.id.au>
@@ -8,7 +8,7 @@
 
 # Makefile module for test suite.
 
-MODULE_DIR := tests
+MODULE_DIR := test
 
 GENERATED_FILES += .coverage
 

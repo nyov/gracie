@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# tests/__init__.py
+# test/__init__.py
 # Part of Gracie, an OpenID provider.
 #
 # Copyright © 2008–2009 Ben Finney <ben+python@benfinney.id.au>

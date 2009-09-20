@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# tests/test_httpresponse.py
+# test/test_httpresponse.py
 # Part of Gracie, an OpenID provider.
 #
 # Copyright © 2007–2009 Ben Finney <ben+python@benfinney.id.au>

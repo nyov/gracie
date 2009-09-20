@@ -31,7 +31,7 @@ setup(
     name=distribution_name,
     version=version.version,
     packages=find_packages(
-        exclude=['tests'],
+        exclude=['test'],
         ),
     scripts=[
         "bin/gracied",
@@ -39,7 +39,7 @@ setup(
 
     # setuptools metadata
     zip_safe=False,
-    test_suite="tests.suite",
+    test_suite="test.suite",
     install_requires=[
         "setuptools",
         "python-daemon >= 1.4.5",
