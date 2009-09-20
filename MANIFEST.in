@@ -3,6 +3,6 @@ include doc/README.txt ChangeLog
 include LICENSE.GPL-2
 include Makefile setuptools.mk
 include gracie/module.mk
-include test/module.mk
-recursive-include bin *
+recursive-include test *
 recursive-include doc *
+recursive-include bin *
