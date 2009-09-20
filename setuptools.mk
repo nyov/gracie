@@ -19,10 +19,6 @@ PYTHON_SETUP := $(PYTHON) ${PYTHON_SETUP_SCRIPT}
 
 PYTHON_BDIST_TARGETS := bdist_egg
 
-GENERATED_FILES += ${MODULE_DIR}/*.egg-info
-GENERATED_FILES += ${MODULE_DIR}/build/
-GENERATED_FILES += ${MODULE_DIR}/dist/
-
 
 .PHONY: setuptools-register
 setuptools-register:

@@ -5,6 +5,7 @@
 	* Use conventional ‘LICENSE.GPL-2’ name for that file.
 	* Provide a ‘README.txt’ symlink so distutils finds it in the top
 	directory.
+	* Allow built distutils files to remain during ‘clean’ operation.
 
 2009-06-21  Ben Finney  <ben@benfinney.id.au>
 
