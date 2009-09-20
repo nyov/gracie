@@ -134,14 +134,6 @@ class BuildLogoImageCommand(distutils.cmd.Command):
         dest_formats = [
             ("PNG", ".%(size)d.png"),
             ]
-        # logo_transforms = {}
-        # for size in logo_sizes:
-        #     for (format, dest_suffix_template) in dest_formats:
-        #         dest_suffix = dest_suffix_template % vars()
-        #         logo_transforms[(format, size)] = {
-        #             'dest_suffix': dest_suffix,
-        #             }
-        # self.logo_transforms = logo_transforms
         self.logo_transforms = dict(
             ((format, size),
              {'dest_suffix': dest_suffix_template % vars()})
