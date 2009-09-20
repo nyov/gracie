@@ -5,8 +5,7 @@
 	* Use conventional ‘LICENSE.GPL-2’ name for that file.
 	* Provide a ‘README.txt’ symlink so Distutils finds it in the top
 	  directory.
-	* Allow built Distutils files to remain during ‘clean’ operation.
-	* Build documents and logos from Distutils build script.
+	* Use Distutils for primary project build system.
 
 2009-06-21  Ben Finney  <ben@benfinney.id.au>
 

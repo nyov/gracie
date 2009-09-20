@@ -76,30 +76,6 @@ Additional style guidelines:
   within a module to break up semantically separate areas of the
   module.
 
-Make
-----
-
-* Any "phony" targets are marked with a separate ``.PHONY: foo``
-  pseudo-target appearing immediately before the ``foo:`` target line
-  to indicate clearly the nature of that target. These will all be
-  collated by ``make`` at run-time into a single ``.PHONY``
-  definition.
-
-* Make files should have their first target named ``all``, which will
-  become the default target when executing ``make``.
-  
-  * The ``all`` target is marked ``.PHONY``.
-
-  * The ``all`` target has no actions.
-
-  * The ``all`` target depends on other, more specifically-named
-    targets which are the main product of the directory.
-
-* Variable substitution for executing commands or programs uses
-  ``$()``.
-
-* Variable substitution for all other variables uses ``${}``.
-
 Unit tests
 ==========
 
