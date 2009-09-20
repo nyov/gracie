@@ -6,7 +6,7 @@
 	* Provide a ‘README.txt’ symlink so Distutils finds it in the top
 	  directory.
 	* Allow built Distutils files to remain during ‘clean’ operation.
-	* Build documents from Distutils build script.
+	* Build documents and logos from Distutils build script.
 
 2009-06-21  Ben Finney  <ben@benfinney.id.au>
 

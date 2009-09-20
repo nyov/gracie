@@ -16,6 +16,7 @@ import distutils.cmd
 import distutils.log
 import os
 import errno
+import subprocess
 import re
 import textwrap
 
@@ -119,6 +120,77 @@ def render_document(source_path, destination_path, writer_name):
         writer_name=writer_name)
 
 
+class BuildLogoImageCommand(distutils.cmd.Command):
+    """ Build logo graphic images for this distribution. """
+
+    user_options = [
+        ("logo-src-file=", None,
+         "Source SVG document for project logo."),
+        ]
+
+    def initialize_options(self):
+        """ Initialise command options to defaults. """
+        logo_sizes = [16, 32, 48, 60, 80, 120]
+        dest_formats = [
+            ("PNG", ".%(size)d.png"),
+            ]
+        # logo_transforms = {}
+        # for size in logo_sizes:
+        #     for (format, dest_suffix_template) in dest_formats:
+        #         dest_suffix = dest_suffix_template % vars()
+        #         logo_transforms[(format, size)] = {
+        #             'dest_suffix': dest_suffix,
+        #             }
+        # self.logo_transforms = logo_transforms
+        self.logo_transforms = dict(
+            ((format, size),
+             {'dest_suffix': dest_suffix_template % vars()})
+            for (format, dest_suffix_template) in dest_formats
+            for size in logo_sizes)
+
+        self.source_suffix_regex = re.compile("\.svg$")
+        self.logo_src_file = None
+
+    def finalize_options(self):
+        """ Finalise command options before execution. """
+
+    def _render_logos(self, in_file_path):
+        """ Render documents from reST source. """
+        for ((format, size), transform) in self.logo_transforms.items():
+            out_file_base = re.sub(
+                self.source_suffix_regex, "",
+                in_file_path)
+            out_file_path = out_file_base + transform['dest_suffix']
+            transform = {
+                'format': format,
+                'size': size,
+                }
+            if is_source_file_newer(in_file_path, out_file_path):
+                render_svg_to_destination(
+                    in_file_path, out_file_path, transform)
+
+    def run(self):
+        """ Execute this command. """
+        in_file_path = self.logo_src_file
+        self._render_logos(in_file_path)
+
+
+def render_svg_to_destination(in_file_path, out_file_path, transform):
+    """ Render SVG document to destination logo file. """
+    geometry = "%(size)dx%(size)d" % transform
+    render_process_args = [
+        "gm", "convert",
+        "-format", "SVG", in_file_path,
+        "-geometry", geometry,
+        "-format", transform['format'], out_file_path,
+        ]
+    distutils.log.info(
+        "rendering logo %(in_file_path)r -> %(out_file_path)r"
+        % vars())
+    out_file = open(out_file_path, 'w')
+    subprocess.call(render_process_args)
+
+
 setup(
     name=distribution_name,
     version=version.version,
@@ -129,6 +201,7 @@ setup(
         "bin/gracied",
         ],
     cmdclass={
+        "build_logo": BuildLogoImageCommand,
         "build_doc": BuildDocumentationCommand,
         },
 

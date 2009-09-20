@@ -16,7 +16,6 @@ PATH = /usr/bin:/bin
 # Directories with semantic meaning
 CODE_PACKAGE_DIRS := gracie
 CODE_PROGRAM_DIR := bin
-DOC_DIR := doc
 TEST_DIR := test
 
 # Variables that will be extended by module include files
@@ -27,7 +26,6 @@ CODE_PROGRAMS :=
 # List of modules (directories) that comprise our 'make' project
 MODULES := ${CODE_PACKAGE_DIRS}
 MODULES += ${CODE_PROGRAM_DIR}
-MODULES += ${DOC_DIR}
 MODULES += ${TEST_DIR}
 
 RM = rm
