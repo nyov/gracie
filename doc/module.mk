@@ -10,13 +10,6 @@
 
 MODULE_DIR := doc
 
-DOC_NAMES = README TODO HACKING
-
-RST_SUFFIX = .txt
-
-XHTML_SUFFIX = .html
-xhtml_doc_files = $(patsubst %,${MODULE_DIR}/%${XHTML_SUFFIX},${DOC_NAMES})
-
 SVG_SUFFIX = .svg
 svg_files = $(wildcard ${MODULE_DIR}/*${SVG_SUFFIX})
 
@@ -27,43 +20,16 @@ LOGO_SIZES = 16 32 48 60 80 120
 LOGO_NAME = gracie-logo
 logo_files = $(patsubst %,${MODULE_DIR}/${LOGO_NAME}.%${PNG_SUFFIX},${LOGO_SIZES})
 
-MANPAGES = gracied.8
-manpage_files = $(patsubst %,${MODULE_DIR}/%,${MANPAGES})
-
-GENERATED_FILES += ${xhtml_doc_files}
 GENERATED_FILES += ${png_files}
 GENERATED_FILES += ${logo_files}
-GENERATED_FILES += ${manpage_files}
-
-RST2HTML = rst2html
-RST2HTML_OPTS =
-
-RST2MAN = rst2man
 
 CONVERT = convert
 
 
 .PHONY: doc
-doc: man xhtml images
+doc: images
 
 build: doc
-
-
-.PHONY: man
-man: ${manpage_files}
-
-%.1: %.1${RST_SUFFIX}
-	$(RST2MAN) "$<" "$@"
-
-%.8: %.8${RST_SUFFIX}
-	$(RST2MAN) "$<" "$@"
-
-
-.PHONY: xhtml
-xhtml: ${xhtml_doc_files}
-
-%${XHTML_SUFFIX}: %${RST_SUFFIX}
-	$(RST2HTML) ${RST2HTML_OPTS} "$<" > "$@"
 
 
 .PHONY: images
