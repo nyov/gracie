@@ -1,6 +1,6 @@
 2009-09-20  Ben Finney  <ben@benfinney.id.au>
 
-	* Manage MANIFEST.in manually, under version control.
+	* Manage ‘MANIFEST.in’ manually, under version control.
 	* Use distutils convention ‘test’ name for unit test directory.
 	* Use conventional ‘LICENSE.GPL-2’ name for that file.
 	* Provide a ‘README.txt’ symlink so distutils finds it in the top
