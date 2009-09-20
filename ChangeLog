@@ -2,6 +2,7 @@
 
 	* Manage MANIFEST.in manually, under version control.
 	* Use distutils convention ‘test’ name for unit test directory.
+	* Use conventional ‘LICENSE.GPL-2’ name for that file.
 
 2009-06-21  Ben Finney  <ben@benfinney.id.au>
 
