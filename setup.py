@@ -33,6 +33,23 @@ short_description, long_description = (
     )
 
 
+def is_source_file_newer(source_path, destination_path):
+    """ Return True if destination is older than source or does not exist. """
+    source_stat = os.stat(source_path)
+    source_ctime = source_stat.st_ctime
+    try:
+        destination_stat = os.stat(destination_path)
+    except OSError, exc:
+        if exc.errno == errno.ENOENT:
+            destination_ctime = None
+        else:
+            raise
+    else:
+        destination_ctime = destination_stat.st_ctime
+    result = (source_ctime > destination_ctime)
+    return result
+
+
 class BuildDocumentationCommand(distutils.cmd.Command):
     """ Build documentation for this distribution. """
     user_options = [
@@ -89,23 +106,6 @@ class BuildDocumentationCommand(distutils.cmd.Command):
         """ Execute this command. """
         for transform in self.document_transforms.values():
             self._render_documents(transform)
-
-
-def is_source_file_newer(source_path, destination_path):
-    """ Return True if destination is older than source or does not exist. """
-    source_stat = os.stat(source_path)
-    source_ctime = source_stat.st_ctime
-    try:
-        destination_stat = os.stat(destination_path)
-    except OSError, exc:
-        if exc.errno == errno.ENOENT:
-            destination_ctime = None
-        else:
-            raise
-    else:
-        destination_ctime = destination_stat.st_ctime
-    result = (source_ctime > destination_ctime)
-    return result
 
 
 def render_document(source_path, destination_path, writer_name):
