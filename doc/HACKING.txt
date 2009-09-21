@@ -2,7 +2,7 @@
 Developer's guide
 =================
 
-:Updated: bignose 2009-01-10
+:Updated: bignose 2009-09-20
 
 Project layout
 ==============
@@ -11,10 +11,10 @@ Project layout
 
     ./                  Top level of source tree
         doc/            Project documentation
-        src/            Program source code
+        bin/            Executable programs
             gracied     Main program daemon
-            gracie/     Gracie library code
-            tests/      Unit tests
+        gracie/         Gracie library code
+        test/           Unit tests
 
 Code style
 ==========
@@ -75,30 +75,6 @@ Additional style guidelines:
 * A page break (``U+000C FORM FEED``) whitespace character is used
   within a module to break up semantically separate areas of the
   module.
-
-Make
-----
-
-* Any "phony" targets are marked with a separate ``.PHONY: foo``
-  pseudo-target appearing immediately before the ``foo:`` target line
-  to indicate clearly the nature of that target. These will all be
-  collated by ``make`` at run-time into a single ``.PHONY``
-  definition.
-
-* Make files should have their first target named ``all``, which will
-  become the default target when executing ``make``.
-  
-  * The ``all`` target is marked ``.PHONY``.
-
-  * The ``all`` target has no actions.
-
-  * The ``all`` target depends on other, more specifically-named
-    targets which are the main product of the directory.
-
-* Variable substitution for executing commands or programs uses
-  ``$()``.
-
-* Variable substitution for all other variables uses ``${}``.
 
 Unit tests
 ==========

@@ -7,59 +7,247 @@
 # Copyright © 2007–2009 Ben Finney <ben+python@benfinney.id.au>
 # This is free software; you may copy, modify and/or distribute this work
 # under the terms of the GNU General Public License, version 2 or later.
-# No warranty expressed or implied. See the file LICENSE for details.
+# No warranty expressed or implied. See the file ‘LICENSE.GPL-2’ for details.
 
 """ Package setup script.
     """
 
+import distutils.cmd
+import distutils.log
+import distutils.util
+import os
+import os.path
+import glob
+import errno
+import subprocess
+import re
 import textwrap
-
-import ez_setup
-ez_setup.use_setuptools()
+import itertools
 
 from setuptools import setup, find_packages
+import docutils.core
 
+distribution_name = "gracie"
 main_module_name = 'gracie'
 main_module = __import__(main_module_name, fromlist=['version'])
 version = main_module.version
 
 short_description, long_description = (
-    textwrap.dedent(d).strip()
-    for d in main_module.__doc__.split('\n\n', 1)
+    textwrap.dedent(desc).strip()
+    for desc in main_module.__doc__.split('\n\n', 1)
     )
 
 
+def is_source_file_newer(source_path, destination_path, force=False):
+    """ Return True if destination is older than source or does not exist. """
+    if force:
+        result = True
+    else:
+        source_stat = os.stat(source_path)
+        source_ctime = source_stat.st_ctime
+        try:
+            destination_stat = os.stat(destination_path)
+        except OSError, exc:
+            if exc.errno == errno.ENOENT:
+                destination_ctime = None
+            else:
+                raise
+        else:
+            destination_ctime = destination_stat.st_ctime
+        result = (source_ctime > destination_ctime)
+
+    return result
+
+
+class BuildDocumentationCommand(distutils.cmd.Command):
+    """ Build documentation for this distribution. """
+    user_options = [
+        ("force", 'f',
+         "Forcibly build everything (ignore file timestamps)."),
+        ("html-src-files=", None,
+         "Source files to build to HTML documents."),
+        ("manpage-8-src-files=", None,
+         "Source files to build to Unix manpages for section 8."),
+        ("logo-src-file=", None,
+         "Source SVG document for project logo."),
+        ]
+
+    boolean_options = ['force']
+
+    def initialize_options(self):
+        """ Initialise command options to defaults. """
+        self.document_transforms = {
+            'html': {
+                'func': render_rst_document,
+                'source_name_option': 'html_src_files',
+                'writer_name': 'html',
+                'source_suffix_regex': re.compile("\.txt$"),
+                'dest_suffix': ".html",
+                },
+            'manpage.8': {
+                'func': render_rst_document,
+                'source_name_option': 'manpage_8_src_files',
+                'writer_name': 'manpage',
+                'source_suffix_regex': re.compile("\.8\.txt$"),
+                'dest_suffix': ".8",
+                },
+            'logo': {
+                'func': render_svg_document,
+                'source_name_option': 'logo_src_file',
+                'size': 80,
+                'format': 'PNG',
+                'source_suffix_regex': re.compile("\.svg$"),
+                'dest_suffix': ".png",
+                },
+            }
+
+        self.force = None
+
+        for transform in self.document_transforms.values():
+            option_name = transform['source_name_option']
+            setattr(self, option_name, None)
+
+    def finalize_options(self):
+        """ Finalise command options before execution. """
+        self.set_undefined_options(
+            'build',
+            ('force', 'force'))
+
+        for (transform_name, transform) in self.document_transforms.items():
+            source_paths = []
+            option_name = transform['source_name_option']
+            source_files_option_value = getattr(self, option_name, None)
+            if source_files_option_value is not None:
+                source_paths = source_files_option_value.split()
+            transform['source_paths'] = source_paths
+
+    def _render_documents(self, transform):
+        """ Render documents that are not up-to-date. """
+        for in_file_path in transform['source_paths']:
+            out_file_base = re.sub(
+                transform['source_suffix_regex'], "",
+                in_file_path)
+            out_file_path = out_file_base + transform['dest_suffix']
+            render_document_func = transform['func']
+            if is_source_file_newer(in_file_path, out_file_path, self.force):
+                out_file_dir = os.path.dirname(out_file_path)
+                if not os.path.isdir(out_file_dir):
+                    self.mkpath(out_file_dir)
+                render_document_func(in_file_path, out_file_path, transform)
+
+    def run(self):
+        """ Execute this command. """
+        for transform in self.document_transforms.values():
+            self._render_documents(transform)
+
+
+def render_rst_document(in_file_path, out_file_path, transform):
+    """ Render a document from source to dest using specified writer. """
+    writer = transform['writer_name']
+    distutils.log.info(
+        "using writer %(writer)r to render document"
+        " %(in_file_path)r -> %(out_file_path)r"
+        % vars())
+    in_file_path = distutils.util.convert_path(in_file_path)
+    out_file_path = distutils.util.convert_path(out_file_path)
+    docutils.core.publish_file(
+        source_path=in_file_path,
+        destination_path=out_file_path,
+        writer_name=transform['writer_name'])
+
+
+def render_svg_document(in_file_path, out_file_path, transform):
+    """ Render SVG document to destination logo file. """
+    geometry = "%(size)dx%(size)d" % transform
+    render_process_args = [
+        "gm", "convert",
+        "-format", "SVG", in_file_path,
+        "-geometry", geometry,
+        "-format", transform['format'], out_file_path,
+        ]
+    in_file_path = distutils.util.convert_path(in_file_path)
+    out_file_path = distutils.util.convert_path(out_file_path)
+    distutils.log.info(
+        "rendering logo %(in_file_path)r -> %(out_file_path)r"
+        % vars())
+    out_file = open(out_file_path, 'w')
+    subprocess.call(render_process_args)
+
+
+class CleanDocumentationCommand(distutils.cmd.Command):
+    """ Clean files generated for this distribution's documentation. """
+    user_options = [
+        ("all", 'a',
+         "Remove all build output, not just temporary by-products."),
+        ("generated-files=", None,
+         "File globs of generated documentation files."),
+        ]
+
+    boolean_options = ['all']
+
+    def initialize_options(self):
+        """ Initialise command options to defaults. """
+        self.all = None
+
+        self.generated_files = None
+
+    def finalize_options(self):
+        """ Finalise command options before execution. """
+        self.set_undefined_options(
+            'clean',
+            ('all', 'all'))
+
+        self.generated_file_globs = self.generated_files.split()
+
+    def run(self):
+        """ Execute this command. """
+        generated_file_paths = set()
+        for file_glob in self.generated_file_globs:
+            generated_file_paths.update(set(
+                glob.glob(file_glob)))
+        for file_path in generated_file_paths:
+            os.remove(file_path)
+
+
 setup(
-    name = main_module_name,
-    version = version.version,
-    packages = find_packages(
-        exclude = ['tests'],
+    name=distribution_name,
+    version=version.version,
+    packages=find_packages(
+        exclude=['test'],
         ),
-    scripts = [
+    scripts=[
         "bin/gracied",
         ],
+    cmdclass={
+        "build_doc": BuildDocumentationCommand,
+        "clean_doc": CleanDocumentationCommand,
+        },
 
     # setuptools metadata
-    zip_safe = False,
-    test_suite = "tests.suite",
-    install_requires = [
+    zip_safe=False,
+    test_suite="test.suite",
+    install_requires=[
+        "setuptools",
         "python-daemon >= 1.4.5",
         "python-openid >= 1.2",
         "Routes >= 1.6.3",
         ],
-    tests_require = [
+    tests_require=[
         "MiniMock >= 1.2.2",
         ],
 
     # PyPI metadata
-    author = version.author_name,
-    author_email = version.author_email,
-    description = short_description,
-    license = version.license,
-    keywords = "gracie openid identity authentication provider",
-    url = main_module._url,
-    long_description = long_description,
-    classifiers = [
+    author=version.author_name,
+    author_email=version.author_email,
+    description=short_description,
+    license=version.license,
+    keywords=[
+        "gracie", "openid", "identity", "authentication", "provider",
+        ],
+    url=main_module._url,
+    long_description=long_description,
+    classifiers=[
+        # Reference: http://pypi.python.org/pypi?%3Aaction=list_classifiers
         "Development Status :: 3 - Alpha",
         "License :: OSI Approved :: GNU General Public License (GPL)",
         "Programming Language :: Python",
@@ -69,3 +257,10 @@ setup(
         "Intended Audience :: System Administrators",
         ],
     )
+
+
+# Local variables:
+# mode: python
+# coding: utf-8
+# End:
+# vim: filetype=python fileencoding=utf-8 :
