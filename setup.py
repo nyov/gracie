@@ -17,10 +17,12 @@ import distutils.log
 import distutils.util
 import os
 import os.path
+import glob
 import errno
 import subprocess
 import re
 import textwrap
+import itertools
 
 from setuptools import setup, find_packages
 import docutils.core
@@ -91,18 +93,12 @@ class BuildDocumentationCommand(distutils.cmd.Command):
                 },
             }
 
-        self.build_lib = None
         for transform in self.document_transforms.values():
             option_name = transform['source_name_option']
             setattr(self, option_name, None)
 
     def finalize_options(self):
         """ Finalise command options before execution. """
-        self.set_undefined_options(
-            'build',
-            ('build_lib', 'build_lib'),
-            ('force', 'force'))
-
         for (transform_name, transform) in self.document_transforms.items():
             source_paths = []
             option_name = transform['source_name_option']
@@ -117,9 +113,7 @@ class BuildDocumentationCommand(distutils.cmd.Command):
             out_file_base = re.sub(
                 transform['source_suffix_regex'], "",
                 in_file_path)
-            out_file_path = os.path.join(
-                self.build_lib,
-                out_file_base + transform['dest_suffix'])
+            out_file_path = out_file_base + transform['dest_suffix']
             render_document_func = transform['func']
             if is_source_file_newer(in_file_path, out_file_path):
                 out_file_dir = os.path.dirname(out_file_path)
@@ -166,6 +160,31 @@ def render_svg_document(in_file_path, out_file_path, transform):
     subprocess.call(render_process_args)
 
 
+class CleanDocumentationCommand(distutils.cmd.Command):
+    """ Clean files generated for this distribution's documentation. """
+    user_options = [
+        ("generated-files=", None,
+         "File globs of generated documentation files."),
+        ]
+
+    def initialize_options(self):
+        """ Initialise command options to defaults. """
+        self.generated_files = None
+
+    def finalize_options(self):
+        """ Finalise command options before execution. """
+        self.generated_file_globs = self.generated_files.split()
+
+    def run(self):
+        """ Execute this command. """
+        generated_file_paths = set()
+        for file_glob in self.generated_file_globs:
+            generated_file_paths.update(set(
+                glob.glob(file_glob)))
+        for file_path in generated_file_paths:
+            os.remove(file_path)
+
+
 setup(
     name=distribution_name,
     version=version.version,
@@ -177,6 +196,7 @@ setup(
         ],
     cmdclass={
         "build_doc": BuildDocumentationCommand,
+        "clean_doc": CleanDocumentationCommand,
         },
 
     # setuptools metadata
