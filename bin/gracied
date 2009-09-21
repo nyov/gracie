@@ -43,41 +43,48 @@ class OptionParser(optparse.OptionParser):
         self.add_option(
             '-V', '--version',
             action='version',
-            help="Report version of program and exit",
+            help="Report version of program and exit.",
             )
         self.add_option(
             '--log-level',
             action='store', type='string', default="WARN",
             dest='loglevel', metavar='LEVEL',
-            help="Set logging verbosity level to LEVEL"
+            help="Set logging verbosity level to LEVEL."
+                 " (default %default)",
+            )
+        self.add_option(
+            '--pidfile',
+            action='store', type='string', default="/var/run/gracied.pid",
+            dest='pidfile', metavar='PATH',
+            help="Manage PID file at PATH."
                  " (default %default)",
             )
         self.add_option(
             '--data-dir',
             action='store', type='string', default="/var/lib/gracie",
             dest='datadir', metavar='DIR',
-            help="Store server runtime data in directory DIR"
+            help="Store server runtime data in directory DIR."
                  " (default %default)",
             )
         self.add_option(
             '--host',
             action='store', type='string', default=default_host,
             dest='host', metavar='HOST',
-            help="Listen on address HOST; can be name or address"
+            help="Listen on address HOST; can be name or address."
                  " (default %default)",
             )
         self.add_option(
             '--port',
             action='store', type='int', default=default_port,
             dest='port', metavar='PORT',
-            help="Listen on TCP port PORT"
+            help="Listen on TCP port PORT."
                  " (default %default)",
             )
         self.add_option(
             '--root-url',
             action='store', type='string', default=default_root_url,
             dest='root_url', metavar='URL',
-            help="Set root URL of the server to URL"
+            help="Set root URL of the server to URL."
                  " (default %default)",
             )
 
