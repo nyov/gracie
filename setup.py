@@ -14,7 +14,9 @@
 
 import distutils.cmd
 import distutils.log
+import distutils.util
 import os
+import os.path
 import errno
 import subprocess
 import re
@@ -58,116 +60,95 @@ class BuildDocumentationCommand(distutils.cmd.Command):
          "Source files to build to HTML documents."),
         ("manpage-8-src-files=", None,
          "Source files to build to Unix manpages for section 8."),
-        ]
-
-    def initialize_options(self):
-        """ Initialise command options to defaults. """
-        self.document_transforms = {
-            'html': {
-                'writer_name': 'html',
-                'source_suffix_regex': re.compile("\.txt$"),
-                'dest_suffix': ".html",
-                },
-            'manpage.8': {
-                'writer_name': 'manpage',
-                'source_suffix_regex': re.compile("\.8\.txt$"),
-                'dest_suffix': ".8",
-                },
-            }
-
-        self.html_src_files = None
-        self.manpage_1_src_files = None
-        self.manpage_8_src_files = None
-
-    def finalize_options(self):
-        """ Finalise command options before execution. """
-        for (transform_name, option_name) in [
-            ('html', 'html_src_files'),
-            ('manpage.8', 'manpage_8_src_files'),
-            ]:
-            transform = self.document_transforms[transform_name]
-            source_paths = []
-            source_files_option_value = getattr(self, option_name, None)
-            if source_files_option_value is not None:
-                source_paths = source_files_option_value.split()
-            transform['source_paths'] = source_paths
-
-    def _render_documents(self, transform):
-        """ Render documents from reST source. """
-        for in_file_path in transform['source_paths']:
-            out_file_base = re.sub(
-                transform['source_suffix_regex'], "",
-                in_file_path)
-            out_file_path = out_file_base + transform['dest_suffix']
-            if is_source_file_newer(in_file_path, out_file_path):
-                render_document(
-                    in_file_path, out_file_path, transform['writer_name'])
-
-    def run(self):
-        """ Execute this command. """
-        for transform in self.document_transforms.values():
-            self._render_documents(transform)
-
-
-def render_document(source_path, destination_path, writer_name):
-    """ Render a document from source to destination. """
-    distutils.log.info(
-        "rendering document %(source_path)r -> %(destination_path)r"
-        % vars())
-    docutils.core.publish_file(
-        source_path=source_path,
-        destination_path=destination_path,
-        writer_name=writer_name)
-
-
-class BuildLogoImageCommand(distutils.cmd.Command):
-    """ Build logo graphic images for this distribution. """
-
-    user_options = [
         ("logo-src-file=", None,
          "Source SVG document for project logo."),
         ]
 
     def initialize_options(self):
         """ Initialise command options to defaults. """
-        logo_sizes = [16, 32, 48, 60, 80, 120]
-        dest_formats = [
-            ("PNG", ".%(size)d.png"),
-            ]
-        self.logo_transforms = dict(
-            ((format, size),
-             {'dest_suffix': dest_suffix_template % vars()})
-            for (format, dest_suffix_template) in dest_formats
-            for size in logo_sizes)
+        self.document_transforms = {
+            'html': {
+                'func': render_rst_document,
+                'source_name_option': 'html_src_files',
+                'writer_name': 'html',
+                'source_suffix_regex': re.compile("\.txt$"),
+                'dest_suffix': ".html",
+                },
+            'manpage.8': {
+                'func': render_rst_document,
+                'source_name_option': 'manpage_8_src_files',
+                'writer_name': 'manpage',
+                'source_suffix_regex': re.compile("\.8\.txt$"),
+                'dest_suffix': ".8",
+                },
+            'logo': {
+                'func': render_svg_document,
+                'source_name_option': 'logo_src_file',
+                'size': 80,
+                'format': 'PNG',
+                'source_suffix_regex': re.compile("\.svg$"),
+                'dest_suffix': ".png",
+                },
+            }
 
-        self.source_suffix_regex = re.compile("\.svg$")
-        self.logo_src_file = None
+        self.build_lib = None
+        for transform in self.document_transforms.values():
+            option_name = transform['source_name_option']
+            setattr(self, option_name, None)
 
     def finalize_options(self):
         """ Finalise command options before execution. """
+        self.set_undefined_options(
+            'build',
+            ('build_lib', 'build_lib'),
+            ('force', 'force'))
 
-    def _render_logos(self, in_file_path):
-        """ Render documents from reST source. """
-        for ((format, size), transform) in self.logo_transforms.items():
+        for (transform_name, transform) in self.document_transforms.items():
+            source_paths = []
+            option_name = transform['source_name_option']
+            source_files_option_value = getattr(self, option_name, None)
+            if source_files_option_value is not None:
+                source_paths = source_files_option_value.split()
+            transform['source_paths'] = source_paths
+
+    def _render_documents(self, transform):
+        """ Render documents that are not up-to-date. """
+        for in_file_path in transform['source_paths']:
             out_file_base = re.sub(
-                self.source_suffix_regex, "",
+                transform['source_suffix_regex'], "",
                 in_file_path)
-            out_file_path = out_file_base + transform['dest_suffix']
-            transform = {
-                'format': format,
-                'size': size,
-                }
+            out_file_path = os.path.join(
+                self.build_lib,
+                out_file_base + transform['dest_suffix'])
+            render_document_func = transform['func']
             if is_source_file_newer(in_file_path, out_file_path):
-                render_svg_to_destination(
-                    in_file_path, out_file_path, transform)
+                out_file_dir = os.path.dirname(out_file_path)
+                if not os.path.isdir(out_file_dir):
+                    self.mkpath(out_file_dir)
+                render_document_func(in_file_path, out_file_path, transform)
 
     def run(self):
         """ Execute this command. """
-        in_file_path = self.logo_src_file
-        self._render_logos(in_file_path)
+        for transform in self.document_transforms.values():
+            self._render_documents(transform)
+
+
+def render_rst_document(in_file_path, out_file_path, transform):
+    """ Render a document from source to dest using specified writer. """
+    writer = transform['writer_name']
+    distutils.log.info(
+        "using writer %(writer)r to render document"
+        " %(in_file_path)r -> %(out_file_path)r"
+        % vars())
+    in_file_path = distutils.util.convert_path(in_file_path)
+    out_file_path = distutils.util.convert_path(out_file_path)
+    docutils.core.publish_file(
+        source_path=in_file_path,
+        destination_path=out_file_path,
+        writer_name=transform['writer_name'])
 
 
-def render_svg_to_destination(in_file_path, out_file_path, transform):
+def render_svg_document(in_file_path, out_file_path, transform):
     """ Render SVG document to destination logo file. """
     geometry = "%(size)dx%(size)d" % transform
     render_process_args = [
@@ -176,6 +157,8 @@ def render_svg_to_destination(in_file_path, out_file_path, transform):
         "-geometry", geometry,
         "-format", transform['format'], out_file_path,
         ]
+    in_file_path = distutils.util.convert_path(in_file_path)
+    out_file_path = distutils.util.convert_path(out_file_path)
     distutils.log.info(
         "rendering logo %(in_file_path)r -> %(out_file_path)r"
         % vars())
@@ -193,7 +176,6 @@ setup(
         "bin/gracied",
         ],
     cmdclass={
-        "build_logo": BuildLogoImageCommand,
         "build_doc": BuildDocumentationCommand,
         },
 
