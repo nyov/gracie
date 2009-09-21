@@ -48,6 +48,12 @@ def setup_gracie_fixtures(testcase):
     testcase.stdout_test = StringIO()
     scaffold.mock("sys.stdout", mock_obj=testcase.stdout_test)
 
+    testcase.test_pidfile_path = "BoGuS_NaMe"
+    scaffold.mock(
+        "gracied.default_pidfile_path",
+        mock_obj=testcase.test_pidfile_path,
+        tracker=testcase.mock_tracker)
+
     scaffold.mock(
         "gracied.OptionParser.error",
         raises=SystemExit,
@@ -67,6 +73,9 @@ def setup_gracie_fixtures(testcase):
             ),
         'argv_loglevel_debug': dict(
             options = ["--log-level", "debug"],
+            ),
+        'change-pidfile': dict(
+            options = ["--pidfile", "/spam/beans.pid"],
             ),
         'change-host': dict(
             options = ["--host", "frobnitz"],
@@ -126,13 +135,13 @@ class Gracie_TestCase(scaffold.TestCase):
         scaffold.mock_restore()
 
     def test_instantiate(self):
-        """ New Gracie instance should be created """
+        """ New Gracie instance should be created. """
         for params in self.valid_apps.values():
             instance = params['instance']
             self.failIfIs(instance, None)
 
     def test_init_configures_logging(self):
-        """ Gracie instance should configure logging """
+        """ Gracie instance should configure logging. """
         params = self.valid_apps['simple']
         args = params['args']
         logging_prev = gracied.logging
@@ -147,7 +156,7 @@ class Gracie_TestCase(scaffold.TestCase):
         self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_wrong_arguments_invokes_parser_error(self):
-        """ Wrong number of cmdline arguments should invoke parser error """
+        """ Wrong number of cmdline arguments should invoke parser error. """
         invalid_argv_params = [
             ["progname", "foo",]
             ]
@@ -164,7 +173,7 @@ class Gracie_TestCase(scaffold.TestCase):
             self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_opts_version_performs_version_action(self):
-        """ Gracie instance should perform version action """
+        """ Gracie instance should perform version action. """
         argv = ["progname", "--version"]
         args = dict(argv=argv)
         scaffold.mock(
@@ -183,7 +192,7 @@ class Gracie_TestCase(scaffold.TestCase):
             )
 
     def test_opts_help_performs_help_action(self):
-        """ Gracie instance should perform help action """
+        """ Gracie instance should perform help action. """
         argv = ["progname", "--help"]
         args = dict(argv=argv)
         expect_stdout = """\
@@ -198,15 +207,23 @@ class Gracie_TestCase(scaffold.TestCase):
             )
 
     def test_opts_loglevel_accepts_specified_value(self):
-        """ Gracie instance should accept log-level setting """
+        """ Gracie instance should accept ‘log-level’ setting. """
         want_loglevel = "DEBUG"
         argv = ["progname", "--log-level", want_loglevel]
         args = dict(argv=argv)
         instance = self.app_class(**args)
         self.failUnlessEqual(want_loglevel, instance.opts.loglevel)
 
+    def test_opts_pidfile_accepts_specified_value(self):
+        """ Gracie instance should accept ‘pidfile’ setting. """
+        want_path = "/foo/bar.pid"
+        argv = ["progname", "--pidfile", want_path]
+        args = dict(argv=argv)
+        instance = self.app_class(**args)
+        self.failUnlessEqual(want_path, instance.opts.pidfile)
+
     def test_opts_datadir_accepts_specified_value(self):
-        """ Gracie instance should accept data-dir setting """
+        """ Gracie instance should accept ‘data-dir’ setting. """
         want_dir = "/foo/bar"
         argv = ["progname", "--data-dir", want_dir]
         args = dict(argv=argv)
@@ -214,7 +231,7 @@ class Gracie_TestCase(scaffold.TestCase):
         self.failUnlessEqual(want_dir, instance.opts.datadir)
 
     def test_opts_host_accepts_specified_value(self):
-        """ Gracie instance should accept host setting """
+        """ Gracie instance should accept ‘host’ setting. """
         want_host = "frobnitz"
         argv = ["progname", "--host", want_host]
         args = dict(argv=argv)
@@ -222,7 +239,7 @@ class Gracie_TestCase(scaffold.TestCase):
         self.failUnlessEqual(want_host, instance.opts.host)
 
     def test_opts_port_accepts_specified_value(self):
-        """ Gracie instance should accept port setting """
+        """ Gracie instance should accept ‘port’ setting. """
         want_port = 9779
         argv = ["progname", "--port", str(want_port)]
         args = dict(argv=argv)
@@ -230,7 +247,7 @@ class Gracie_TestCase(scaffold.TestCase):
         self.failUnlessEqual(want_port, instance.opts.port)
 
     def test_opts_root_url_accepts_specified_value(self):
-        """ Gracie instance should accept root_url setting """
+        """ Gracie instance should accept ‘root_url’ setting. """
         want_url = "http://spudnik/spam"
         argv = ["progname", "--root-url", want_url]
         args = dict(argv=argv)
@@ -334,12 +351,6 @@ class Gracie_become_daemon_TestCase(scaffold.TestCase):
             returns=self.mock_context,
             tracker=self.mock_tracker)
 
-        self.test_pidfile_name = "BoGuS_NaMe"
-        scaffold.mock(
-            "gracied.pidfile_name",
-            mock_obj=self.test_pidfile_name,
-            tracker=self.mock_tracker)
-
         self.test_working_directory = "BoGuS_DiR"
         scaffold.mock(
             "os.getcwd",
@@ -364,7 +375,7 @@ class Gracie_become_daemon_TestCase(scaffold.TestCase):
         params = self.valid_apps['simple']
         instance = params['instance']
         pidfile_path = os.path.join(
-            self.test_working_directory, self.test_pidfile_name)
+            self.test_working_directory, self.test_pidfile_path)
         expect_mock_output = """\
             ...
             Called pidlockfile.PIDLockFile(%(pidfile_path)r)
