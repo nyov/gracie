@@ -48,6 +48,12 @@ def setup_gracie_fixtures(testcase):
     testcase.stdout_test = StringIO()
     scaffold.mock("sys.stdout", mock_obj=testcase.stdout_test)
 
+    testcase.test_pidfile_path = "BoGuS_NaMe"
+    scaffold.mock(
+        "gracied.default_pidfile_path",
+        mock_obj=testcase.test_pidfile_path,
+        tracker=testcase.mock_tracker)
+
     scaffold.mock(
         "gracied.OptionParser.error",
         raises=SystemExit,
@@ -67,6 +73,9 @@ def setup_gracie_fixtures(testcase):
             ),
         'argv_loglevel_debug': dict(
             options = ["--log-level", "debug"],
+            ),
+        'change-pidfile': dict(
+            options = ["--pidfile", "/spam/beans.pid"],
             ),
         'change-host': dict(
             options = ["--host", "frobnitz"],
@@ -342,12 +351,6 @@ class Gracie_become_daemon_TestCase(scaffold.TestCase):
             returns=self.mock_context,
             tracker=self.mock_tracker)
 
-        self.test_pidfile_name = "BoGuS_NaMe"
-        scaffold.mock(
-            "gracied.pidfile_name",
-            mock_obj=self.test_pidfile_name,
-            tracker=self.mock_tracker)
-
         self.test_working_directory = "BoGuS_DiR"
         scaffold.mock(
             "os.getcwd",
@@ -372,7 +375,7 @@ class Gracie_become_daemon_TestCase(scaffold.TestCase):
         params = self.valid_apps['simple']
         instance = params['instance']
         pidfile_path = os.path.join(
-            self.test_working_directory, self.test_pidfile_name)
+            self.test_working_directory, self.test_pidfile_path)
         expect_mock_output = """\
             ...
             Called pidlockfile.PIDLockFile(%(pidfile_path)r)
