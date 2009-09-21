@@ -38,26 +38,32 @@ short_description, long_description = (
     )
 
 
-def is_source_file_newer(source_path, destination_path):
+def is_source_file_newer(source_path, destination_path, force=False):
     """ Return True if destination is older than source or does not exist. """
-    source_stat = os.stat(source_path)
-    source_ctime = source_stat.st_ctime
-    try:
-        destination_stat = os.stat(destination_path)
-    except OSError, exc:
-        if exc.errno == errno.ENOENT:
-            destination_ctime = None
-        else:
-            raise
+    if force:
+        result = True
     else:
-        destination_ctime = destination_stat.st_ctime
-    result = (source_ctime > destination_ctime)
+        source_stat = os.stat(source_path)
+        source_ctime = source_stat.st_ctime
+        try:
+            destination_stat = os.stat(destination_path)
+        except OSError, exc:
+            if exc.errno == errno.ENOENT:
+                destination_ctime = None
+            else:
+                raise
+        else:
+            destination_ctime = destination_stat.st_ctime
+        result = (source_ctime > destination_ctime)
+
     return result
 
 
 class BuildDocumentationCommand(distutils.cmd.Command):
     """ Build documentation for this distribution. """
     user_options = [
+        ("force", 'f',
+         "Forcibly build everything (ignore file timestamps)."),
         ("html-src-files=", None,
          "Source files to build to HTML documents."),
         ("manpage-8-src-files=", None,
@@ -65,6 +71,8 @@ class BuildDocumentationCommand(distutils.cmd.Command):
         ("logo-src-file=", None,
          "Source SVG document for project logo."),
         ]
+
+    boolean_options = ['force']
 
     def initialize_options(self):
         """ Initialise command options to defaults. """
@@ -93,12 +101,18 @@ class BuildDocumentationCommand(distutils.cmd.Command):
                 },
             }
 
+        self.force = None
+
         for transform in self.document_transforms.values():
             option_name = transform['source_name_option']
             setattr(self, option_name, None)
 
     def finalize_options(self):
         """ Finalise command options before execution. """
+        self.set_undefined_options(
+            'build',
+            ('force', 'force'))
+
         for (transform_name, transform) in self.document_transforms.items():
             source_paths = []
             option_name = transform['source_name_option']
@@ -115,7 +129,7 @@ class BuildDocumentationCommand(distutils.cmd.Command):
                 in_file_path)
             out_file_path = out_file_base + transform['dest_suffix']
             render_document_func = transform['func']
-            if is_source_file_newer(in_file_path, out_file_path):
+            if is_source_file_newer(in_file_path, out_file_path, self.force):
                 out_file_dir = os.path.dirname(out_file_path)
                 if not os.path.isdir(out_file_dir):
                     self.mkpath(out_file_dir)
@@ -163,16 +177,26 @@ def render_svg_document(in_file_path, out_file_path, transform):
 class CleanDocumentationCommand(distutils.cmd.Command):
     """ Clean files generated for this distribution's documentation. """
     user_options = [
+        ("all", 'a',
+         "Remove all build output, not just temporary by-products."),
         ("generated-files=", None,
          "File globs of generated documentation files."),
         ]
 
+    boolean_options = ['all']
+
     def initialize_options(self):
         """ Initialise command options to defaults. """
+        self.all = None
+
         self.generated_files = None
 
     def finalize_options(self):
         """ Finalise command options before execution. """
+        self.set_undefined_options(
+            'clean',
+            ('all', 'all'))
+
         self.generated_file_globs = self.generated_files.split()
 
     def run(self):
