@@ -143,13 +143,13 @@ class BuildDocumentationCommand(distutils.cmd.Command):
 
 def render_rst_document(in_file_path, out_file_path, transform):
     """ Render a document from source to dest using specified writer. """
+    in_file_path = distutils.util.convert_path(in_file_path)
+    out_file_path = distutils.util.convert_path(out_file_path)
     writer = transform['writer_name']
     distutils.log.info(
         "using writer %(writer)r to render document"
         " %(in_file_path)r -> %(out_file_path)r"
         % vars())
-    in_file_path = distutils.util.convert_path(in_file_path)
-    out_file_path = distutils.util.convert_path(out_file_path)
     docutils.core.publish_file(
         source_path=in_file_path,
         destination_path=out_file_path,
@@ -158,6 +158,8 @@ def render_rst_document(in_file_path, out_file_path, transform):
 
 def render_svg_document(in_file_path, out_file_path, transform):
     """ Render SVG document to destination logo file. """
+    in_file_path = distutils.util.convert_path(in_file_path)
+    out_file_path = distutils.util.convert_path(out_file_path)
     geometry = "%(size)dx%(size)d" % transform
     render_process_args = [
         "gm", "convert",
@@ -165,12 +167,9 @@ def render_svg_document(in_file_path, out_file_path, transform):
         "-geometry", geometry,
         "-format", transform['format'], out_file_path,
         ]
-    in_file_path = distutils.util.convert_path(in_file_path)
-    out_file_path = distutils.util.convert_path(out_file_path)
     distutils.log.info(
         "rendering logo %(in_file_path)r -> %(out_file_path)r"
         % vars())
-    out_file = open(out_file_path, 'w')
     subprocess.call(render_process_args)
 
 
