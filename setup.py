@@ -13,6 +13,9 @@
     """
 
 import distutils.cmd
+import distutils.command.build
+import distutils.command.install
+import distutils.command.clean
 import distutils.log
 import distutils.util
 import os
@@ -140,6 +143,22 @@ class BuildDocumentationCommand(distutils.cmd.Command):
         for transform in self.document_transforms.values():
             self._render_documents(transform)
 
+
+class BuildCommand(distutils.command.build.build):
+    """ Custom ‘build’ command for this distribution. """
+
+    sub_commands = (
+        [('build_doc', lambda self: True)]
+        + distutils.command.build.build.sub_commands)
+
+
+class InstallCommand(distutils.command.install.install):
+    """ Custom ‘install’ command for this distribution. """
+
+    sub_commands = (
+        [('build_doc', lambda self: True)]
+        + distutils.command.install.install.sub_commands)
+
 
 def render_rst_document(in_file_path, out_file_path, transform):
     """ Render a document from source to dest using specified writer. """
@@ -207,6 +226,14 @@ class CleanDocumentationCommand(distutils.cmd.Command):
         for file_path in generated_file_paths:
             os.remove(file_path)
 
+
+class CleanCommand(distutils.command.clean.clean):
+    """ Custom ‘clean’ command for this distribution. """
+
+    sub_commands = (
+        [('clean_doc', lambda self: True)]
+        + distutils.command.clean.clean.sub_commands)
+
 
 setup(
     name=distribution_name,
@@ -218,7 +245,10 @@ setup(
         "bin/gracied",
         ],
     cmdclass={
+        "build": BuildCommand,
         "build_doc": BuildDocumentationCommand,
+        "install": InstallCommand,
+        "clean": CleanCommand,
         "clean_doc": CleanDocumentationCommand,
         },
 
