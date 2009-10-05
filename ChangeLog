@@ -1,3 +1,7 @@
+2009-10-05  Ben Finney  <ben@benfinney.id.au>
+
+	Version 0.2.10 released.
+
 2009-09-21  Ben Finney  <ben@benfinney.id.au>
 
 	* Allow command-line specification of PID file path.
