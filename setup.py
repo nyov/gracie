@@ -227,12 +227,17 @@ class CleanDocumentationCommand(distutils.cmd.Command):
             os.remove(file_path)
 
 
-class CleanCommand(distutils.command.clean.clean):
+class CleanCommand(distutils.command.clean.clean, object):
     """ Custom ‘clean’ command for this distribution. """
 
     sub_commands = (
         [('clean_doc', lambda self: True)]
         + distutils.command.clean.clean.sub_commands)
+
+    def run(self):
+        for cmd_name in self.get_sub_commands():
+            self.run_command(cmd_name)
+        super(CleanCommand, self).run()
 
 
 setup(
