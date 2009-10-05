@@ -28,12 +28,12 @@ gracied = scaffold.make_module_from_file(
 
 
 class Stub_GracieServer(object):
-    """ Stub class for GracieServer """
+    """ Stub class for GracieServer. """
 
     version = "3.14.test"
 
     def __init__(self, socket_params, opts):
-        """ Set up a new instance """
+        """ Set up a new instance. """
 
     def serve_forever(self):
         pass
