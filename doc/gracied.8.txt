@@ -7,7 +7,7 @@ local-authentication OpenID provider
 ------------------------------------
 
 :Author: |author|
-:Date: 2009-05-08
+:Date: 2009-12-27
 :Copyright: GNU General Public License, version 2 or later
 :Manual section: 8
 :Manual group: Gracie OpenID provider
@@ -67,13 +67,14 @@ This manual page was written by |author|.
 ..  |authorname| replace:: Ben Finney
 ..  |authoremail| replace:: <ben+python@benfinney.id.au>
 
+
 ..
     Local variables:
-    mode: rst
     coding: utf-8
+    mode: rst
     time-stamp-format: "%:y-%02m-%02d"
-    time-stamp-start: "^:Date:[         ]+"
+    time-stamp-start: "^:Updated:[ 	]+"
     time-stamp-end: "$"
     time-stamp-line-limit: 20
     End:
-    vim: filetype=rst fileencoding=utf-8 :
+    vim: fileencoding=utf-8 filetype=rst :

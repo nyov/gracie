@@ -1,3 +1,7 @@
+2009-12-27  Ben Finney  <ben+python@benfinney.id.au>
+
+	* Add editor hints and formatting fixes for documentation.
+
 2009-10-05  Ben Finney  <ben@benfinney.id.au>
 
 	Version 0.2.10 released.
@@ -65,3 +69,17 @@
 2007-03-05  Ben Finney  <ben@benfinney.id.au>
 
 	* Initial work on OpenID server.
+
+
+Copyright © 2007–2009 Ben Finney <ben+python@benfinney.id.au>.
+
+This work is free software: you are hereby free to redistribute this
+file, with or without modification, provided the copyright notice and
+this permission notice are preserved.
+
+Local variables:
+coding: utf-8
+mode: changelog
+indent-tabs-mode: t
+End:
+vim: fileencoding=utf-8 filetype=changelog noexpandtab :

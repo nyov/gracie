@@ -2,36 +2,47 @@
 Development tasks to be done
 ============================
 
-:Updated: bignose 2007-08-22
+:Updated: 2009-12-27
 
 Documentation
 =============
 
-* Detailed installation and configuration docs
+* Detailed installation and configuration docs.
 
 Packaging
 =========
 
-* Package as a Debian package
+* Package as a Debian package.
 
 Features
 ========
 
-* Use TLS for login
+* Use TLS for login.
 
-* Conform to OpenID 1.2 and/or 2.0
+* Conform to OpenID 1.2 and/or 2.0.
 
-* Use separate process for root-required PAM auth
+* Use separate process for root-required PAM auth.
 
-* Configuration via config file, read at startup
+* Configuration via config file, read at startup.
 
 * Configurable setting: Present user with confirmation form to
-  authorise or deny OpenID consumer asking for identity
+  authorise or deny OpenID consumer asking for identity.
 
 Wheel, reinvention, avoidance of
 ================================
 
-* Use templating system for page generation
+* Use templating system for page generation.
 
-* Use web framework for HTTP request handling
+* Use web framework for HTTP request handling.
 
+
+..
+    Local variables:
+    coding: utf-8
+    mode: rst
+    time-stamp-format: "%:y-%02m-%02d"
+    time-stamp-start: "^:Updated:[ 	]+"
+    time-stamp-end: "$"
+    time-stamp-line-limit: 20
+    End:
+    vim: fileencoding=utf-8 filetype=rst :

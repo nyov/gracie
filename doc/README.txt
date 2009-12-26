@@ -1,5 +1,3 @@
-..  vim: filetype=rst : -*- coding: utf-8; mode: rst -*-
-
 ======
 Gracie
 ======
@@ -8,7 +6,7 @@ A simple OpenID provider for local system accounts
 ==================================================
 
 :Author:    Ben Finney <ben+openid@benfinney.id.au>
-:Updated:   2009-09-20
+:Updated:   2009-12-27
 
 Gracie is an `OpenID`_ provider which authenticates users against
 local Unix system accounts.
@@ -81,3 +79,15 @@ or, at your option, any later version of that license.
 No warranty expressed or implied. See the file ‘LICENSE.GPL-2’ for details.
 
 ..  _GNU General Public License: http://www.gnu.org/licenses/gpl.html
+
+
+..
+    Local variables:
+    coding: utf-8
+    mode: rst
+    time-stamp-format: "%:y-%02m-%02d"
+    time-stamp-start: "^:Updated:[ 	]+"
+    time-stamp-end: "$"
+    time-stamp-line-limit: 20
+    End:
+    vim: fileencoding=utf-8 filetype=rst :

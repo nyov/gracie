@@ -2,7 +2,8 @@
 Developer's guide
 =================
 
-:Updated: bignose 2009-09-20
+:Author: Ben Finney <ben+python@benfinney.id.au>
+:Updated: 2009-12-27
 
 Project layout
 ==============
@@ -43,8 +44,8 @@ particular:
     line appears on the same line as the opening triple-quote,
     separated by a single space.
   
-  * Further lines, if needed, are separated from the first by one blank
-    line.
+  * Further lines, if needed, are separated from the first by one
+    blank line.
 
   * The closing triple-quote appears on a separate line.
 
@@ -53,9 +54,13 @@ particular:
     def frobnicate(spam):
         """ Perform frobnication on ``spam``.
 
-        The frobnication is done by the Dietzel-Venkman algorithm, and
-        optimises for the case where ``spam`` is agglutinative.
-        """
+            The frobnication is done by the Dietzel-Venkman algorithm,
+            and optimises for the case where ``spam`` is freebled and
+            agglutinative.
+
+            """
+        spagnify(spam)
+        # …
 
 * All ``import`` statements appear at the top of the module.
 
@@ -94,8 +99,8 @@ code.
   with the unit test suite for the project running continuously, or
   automatically every few seconds.
 
-* Any time a test is failing, the only valid change is to make all tests
-  pass.
+* Any time a test is failing, the only valid change is to make all
+  tests pass.
 
 * Develop new interface features (changes to the program unit's
   behaviour) only when all current tests pass.
@@ -112,9 +117,9 @@ code.
   * *First* write a single, specific test case for that new behaviour,
     then watch the test fail in the absence of the desired behaviour.
 
-  * Implement the minimum necessary change to satisfy the failing test.
-    Continue until all tests pass again, then stop making functional
-    changes.
+  * Implement the minimum necessary change to satisfy the failing
+    test. Continue until all tests pass again, then stop making
+    functional changes.
 
   * Once all tests (including the new test) pass, consider refactoring
     the code and the tests immediately, then ensure all the tests pass
@@ -126,3 +131,15 @@ Test-driven development is not absolutely necessary, but is the
 simplest, most direct way to generate the kind of program changes
 accompanied by unit tests that are necessary for inclusion in the
 project.
+
+
+..
+    Local variables:
+    coding: utf-8
+    mode: rst
+    time-stamp-format: "%:y-%02m-%02d"
+    time-stamp-start: "^:Updated:[ 	]+"
+    time-stamp-end: "$"
+    time-stamp-line-limit: 20
+    End:
+    vim: fileencoding=utf-8 filetype=rst :
