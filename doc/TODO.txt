@@ -9,11 +9,6 @@ Documentation
 
 * Detailed installation and configuration docs.
 
-Packaging
-=========
-
-* Package as a Debian package.
-
 Features
 ========
 
