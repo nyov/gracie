@@ -1,6 +1,8 @@
 2009-12-27  Ben Finney  <ben+python@benfinney.id.au>
 
-	* Add editor hints and formatting fixes for documentation.
+	* (general): Add editor hints and formatting fixes for
+	documentation.
+	* setup.py: Declare correct dependency on Docutils.
 	* doc/README.txt: Updates and corrections to dependency list.
 
 2009-10-05  Ben Finney  <ben@benfinney.id.au>
