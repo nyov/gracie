@@ -19,14 +19,23 @@ OpenID consumers.
 Requirements
 ------------
 
-* Python >= 2.4
+* `Python`_ >= 2.4
 
-* python-openid
+* `python-openid`_
 
-* python-pam
+* `PyPAM`_
   (for systems using PAM for authentication)
 
-* Routes
+* `Routes`_
+
+* `Docutils`_ >= 0.6
+  (for rendering the documentation)
+
+..  _Python: http://www.python.org/
+..  _python-openid: http://pypi.python.org/pypi/python-openid/
+..  _PyPAM: http://www.pangalactic.org/PyPAM/
+..  _Routes: http://pypi.python.org/pypi/Routes/
+..  _Docutils: http://docutils.sourceforge.net/
 
 PAM configuration
 -----------------
