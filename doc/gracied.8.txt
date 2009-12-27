@@ -73,7 +73,7 @@ This manual page was written by |author|.
     coding: utf-8
     mode: rst
     time-stamp-format: "%:y-%02m-%02d"
-    time-stamp-start: "^:Updated:[ 	]+"
+    time-stamp-start: "^:Date:[ 	]+"
     time-stamp-end: "$"
     time-stamp-line-limit: 20
     End:
