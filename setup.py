@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/python
 # -*- coding: utf-8 -*-
 
 # setup.py
@@ -9,7 +9,7 @@
 # under the terms of the GNU General Public License, version 2 or later.
 # No warranty expressed or implied. See the file ‘LICENSE.GPL-2’ for details.
 
-""" Package setup script.
+""" Python distutils setup for ‘gracie’ distribution.
     """
 
 import distutils.cmd
@@ -25,19 +25,20 @@ import errno
 import subprocess
 import re
 import textwrap
-import itertools
 
 from setuptools import setup, find_packages
 import docutils.core
 
+
 distribution_name = "gracie"
 main_module_name = 'gracie'
 main_module = __import__(main_module_name, fromlist=['version'])
 version = main_module.version
 
+main_module_doc = main_module.__doc__.decode('utf-8')
 short_description, long_description = (
     textwrap.dedent(desc).strip()
-    for desc in main_module.__doc__.split('\n\n', 1)
+    for desc in main_module_doc.split('\n\n', 1)
     )
 
 
@@ -215,7 +216,10 @@ class CleanDocumentationCommand(distutils.cmd.Command):
             'clean',
             ('all', 'all'))
 
-        self.generated_file_globs = self.generated_files.split()
+        if self.generated_files:
+            self.generated_file_globs = self.generated_files.split()
+        else:
+            self.generated_file_globs = []
 
     def run(self):
         """ Execute this command. """
@@ -257,29 +261,30 @@ setup(
         "clean_doc": CleanDocumentationCommand,
         },
 
-    # setuptools metadata
+    # Setuptools metadata.
     zip_safe=False,
-    test_suite="test.suite",
     install_requires=[
         "setuptools",
-        "python-daemon >= 1.4.5",
-        "python-openid >= 1.2",
-        "Routes >= 1.6.3",
+        "docutils >=0.6",
+        "python-daemon >=1.4.5",
+        "python-openid >=1.2",
+        "Routes >=1.6.3",
         ],
     tests_require=[
         "MiniMock >= 1.2.2",
         ],
+    test_suite="test.suite",
 
-    # PyPI metadata
+    # PyPI metadata.
     author=version.author_name,
     author_email=version.author_email,
     description=short_description,
-    license=version.license,
     keywords=[
         "gracie", "openid", "identity", "authentication", "provider",
         ],
     url=main_module._url,
     long_description=long_description,
+    license=version.license,
     classifiers=[
         # Reference: http://pypi.python.org/pypi?%3Aaction=list_classifiers
         "Development Status :: 3 - Alpha",
@@ -294,7 +299,7 @@ setup(
 
 
 # Local variables:
-# mode: python
 # coding: utf-8
+# mode: python
 # End:
-# vim: filetype=python fileencoding=utf-8 :
+# vim: fileencoding=utf-8 filetype=python :
