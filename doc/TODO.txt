@@ -30,6 +30,13 @@ Wheel, reinvention, avoidance of
 
 * Use web framework for HTTP request handling.
 
+* Use a simpler PAM library.
+
+  * Investigate `pam`_ and `spypam`_.
+
+    ..  _pam: http://pypi.python.org/pypi/pam
+    ..  _spypam: http://pypi.python.org/pypi/spypam
+
 
 ..
     Local variables:
