@@ -19,12 +19,11 @@ OpenID consumers.
 Requirements
 ------------
 
-* `Python`_ >= 2.4
+* `Python`_ >= 2.5
 
 * `python-openid`_
 
 * `PyPAM`_
-  (for systems using PAM for authentication)
 
 * `Routes`_
 
