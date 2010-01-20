@@ -1,3 +1,7 @@
+2010-01-20  Ben Finney  <ben+python@benfinney.id.au>
+
+	* Update copyright notices.
+
 2009-12-27  Ben Finney  <ben+python@benfinney.id.au>
 
 	* (general): Add editor hints and formatting fixes for
@@ -74,7 +78,7 @@
 	* Initial work on OpenID server.
 
 
-Copyright © 2007–2009 Ben Finney <ben+python@benfinney.id.au>.
+Copyright © 2007–2010 Ben Finney <ben+python@benfinney.id.au>.
 
 This work is free software: you are hereby free to redistribute this
 file, with or without modification, provided the copyright notice and
