@@ -59,6 +59,11 @@ class GracieServer(object):
             % vars()
             )
 
+    def socket_fileno(self):
+        """ Get the file descriptor for this server's network socket. """
+        fileno = self.httpserver.socket.fileno()
+        return fileno
+
     def serve_forever(self):
         """ Begin serving requests indefinitely """
         self.httpserver.serve_forever()

@@ -30,6 +30,10 @@ class Stub_HTTPServer(object):
         server_address, RequestHandlerClass, gracie_server
         ):
         """ Set up a new instance """
+        class FakeFileDescriptorFile(object):
+            def __init__(self):
+                self.fileno = lambda: 432
+        self.socket = FakeFileDescriptorFile()
 
     server_bind = stub_server_bind
 
@@ -321,3 +325,11 @@ class GracieServer_TestCase(scaffold.TestCase):
     def test_serve_forever_is_callable(self):
         """ GracieServer.serve_forever should be callable """
         self.failUnless(callable(self.server_class.serve_forever))
+
+    def test_returns_http_server_socket_fileno(self):
+        """ Should return fileno of HTTP server socket. """
+        params = self.valid_servers['simple']
+        instance = params['instance']
+        expect_fileno = instance.httpserver.socket.fileno()
+        fileno = instance.socket_fileno()
+        self.failUnlessEqual(expect_fileno, fileno)
