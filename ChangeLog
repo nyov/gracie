@@ -1,5 +1,7 @@
 2010-02-12  Ben Finney  <ben+python@benfinney.id.au>
 
+	Version 0.2.11 released.
+
 	* gracie/server.py: Expose the file descriptor of the network
 	  socket.
 	* bin/gracied: Keep the network socket open when becoming a
