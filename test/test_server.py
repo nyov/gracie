@@ -19,22 +19,23 @@ from gracie import server
 
 
 def stub_server_bind(server):
-    """ Stub method to get server location """
+    """ Stub method to get server location. """
     (host, port) = server.server_address
     (server.server_name, server.server_port) = (host, port)
 
 class Stub_HTTPServer(object):
-    """ Stub class for HTTPServer """
+    """ Stub class for HTTPServer. """
     def __init__(
         self,
         server_address, RequestHandlerClass, gracie_server
         ):
-        """ Set up a new instance """
+        """ Set up a new instance. """
+        self.fileno = lambda: 432
 
     server_bind = stub_server_bind
 
 class Stub_ResponseHeader(object):
-    """ Stub class for response header """
+    """ Stub class for response header. """
 
     def __init__(self, code, protocol=None):
         self.code = code
@@ -42,16 +43,16 @@ class Stub_ResponseHeader(object):
         self.fields = dict()
 
 class Stub_Response(object):
-    """ Stub class for Response """
+    """ Stub class for Response. """
 
     def __init__(self, header, data=None):
-        """ Set up a new instance """
+        """ Set up a new instance. """
         self.header = header
         self.data = data
 
 
 class Stub_ConsumerAuthStore(object):
-    """ Stub class for ConsumerAuthStore """
+    """ Stub class for ConsumerAuthStore. """
 
     def __init__(self):
         self._authorisations = dict()
@@ -63,20 +64,20 @@ class Stub_ConsumerAuthStore(object):
         return self._authorisations.get(auth_tuple, False)
 
 class Stub_ConsumerAuthStore_always_auth(Stub_ConsumerAuthStore):
-    """ ConsumerAuthStore stub that always authorises """
+    """ ConsumerAuthStore stub that always authorises. """
 
     def is_authorised(self, auth_tuple):
         return True
 
 class Stub_ConsumerAuthStore_never_auth(Stub_ConsumerAuthStore):
-    """ ConsumerAuthStore stub that never authorises """
+    """ ConsumerAuthStore stub that never authorises. """
 
     def is_authorised(self, auth_tuple):
         return False
 
 
 class Stub_SessionManager(object):
-    """ Stub class for SessionManager """
+    """ Stub class for SessionManager. """
 
     def store_session(self, session):
         pass
@@ -89,20 +90,20 @@ class Stub_SessionManager(object):
 
 
 class Stub_HTTPRequestHandler(object):
-    """ Stub class for HTTPRequestHandler """
+    """ Stub class for HTTPRequestHandler. """
 
 
 class Stub_OpenIDError(Exception):
-    """ Stub error class for openid module """
+    """ Stub error class for openid module. """
 
 class Stub_OpenIDStore(object):
-    """ Stub class for openid backing store """
+    """ Stub class for openid backing store. """
 
     def __init__(self, _, *args, **kwargs):
         """ Set up a new instance """
 
 class Stub_OpenIDServer(object):
-    """ Stub class for an OpenID protocol server """
+    """ Stub class for an OpenID protocol server. """
 
     def __init__(self, store):
         """ Set up a new instance """
@@ -114,7 +115,7 @@ class Stub_OpenIDServer(object):
         return Stub_OpenIDWebResponse()
 
 class Stub_OpenIDRequest(object):
-    """ Stub class for an OpenID protocol request """
+    """ Stub class for an OpenID protocol request. """
 
     def __init__(self, http_query, params=None):
         """ Set up a new instance """
@@ -138,7 +139,7 @@ class Stub_OpenIDRequest(object):
         return response
 
 class Stub_OpenIDResponse(object):
-    """ Stub class for an OpenID protocol response """
+    """ Stub class for an OpenID protocol response. """
 
     def __init__(self, params=None):
         self.params = params
@@ -150,7 +151,7 @@ class Stub_OpenIDResponse(object):
         return url
 
 class Stub_OpenIDWebResponse(object):
-    """ Stub class for an encoded OpenID response """
+    """ Stub class for an encoded OpenID response. """
 
     def __init__(self):
         """ Set up a new instance """
@@ -159,7 +160,7 @@ class Stub_OpenIDWebResponse(object):
         self.body = "OpenID response"
 
 def make_default_opts():
-    """ Create commandline opts instance with required values """
+    """ Create commandline opts instance with required values. """
     opts = optparse.Values(dict(
         datadir = "/tmp",
         host = "example.org", port = 9779,
@@ -171,7 +172,7 @@ class GracieServer_TestCase(scaffold.TestCase):
     """ Test cases for GracieServer class. """
 
     def setUp(self):
-        """ Set up test fixtures """
+        """ Set up test fixtures. """
         self.mock_tracker = scaffold.MockTracker()
 
         self.server_class = server.GracieServer
@@ -235,17 +236,17 @@ class GracieServer_TestCase(scaffold.TestCase):
             params['instance'] = instance
 
     def tearDown(self):
-        """ Tear down test fixtures """
+        """ Tear down test fixtures. """
         scaffold.mock_restore()
 
     def test_instantiate(self):
-        """ New GracieServer instance should be created """
+        """ New GracieServer instance should be created. """
         for params in self.valid_servers.values():
             instance = params['instance']
             self.failIfIs(None, instance)
 
     def test_version_as_specified(self):
-        """ GracieServer should have specified version string """
+        """ GracieServer should have specified version string. """
         params = self.valid_servers['simple']
         scaffold.mock(
             "server.version", tracker=self.mock_tracker)
@@ -255,14 +256,14 @@ class GracieServer_TestCase(scaffold.TestCase):
         self.failUnlessEqual(version_test, instance.version)
 
     def test_opts_as_specified(self):
-        """ GracieServer should have specified opts mapping """
+        """ GracieServer should have specified opts mapping. """
         params = self.valid_servers['with-opts']
         instance = params['instance']
         opts = params['opts']
         self.failUnlessEqual(opts, instance.opts)
 
     def test_server_creates_http_server(self):
-        """ GracieServer should create an HTTP server """
+        """ GracieServer should create an HTTP server. """
         params = self.valid_servers['simple']
         args = params['args']
         opts = params['opts']
@@ -279,14 +280,14 @@ class GracieServer_TestCase(scaffold.TestCase):
         self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_server_has_openid_server(self):
-        """ GracieServer should have an openid_server attribute """
+        """ GracieServer should have an openid_server attribute. """
         params = self.valid_servers['simple']
         instance = params['instance']
         openid_server = instance.openid_server
         self.failUnless(isinstance(openid_server, Stub_OpenIDServer))
 
     def test_openid_store_created_with_datadir(self):
-        """ OpenIDStore should be created with specified datadir """
+        """ OpenIDStore should be created with specified datadir. """
         params = self.valid_servers['datadir']
         datadir = params['datadir']
         scaffold.mock(
@@ -298,26 +299,34 @@ class GracieServer_TestCase(scaffold.TestCase):
         self.failUnlessMockCheckerMatch(expect_mock_output)
 
     def test_server_has_auth_service(self):
-        """ GracieServer should have an auth_service attribute """
+        """ GracieServer should have an auth_service attribute. """
         params = self.valid_servers['simple']
         instance = params['instance']
         auth_service = instance.auth_service
         self.failIfIs(None, auth_service)
 
     def test_server_has_session_manager(self):
-        """ GracieServer should have a sess_manager attribute """
+        """ GracieServer should have a sess_manager attribute. """
         params = self.valid_servers['simple']
         instance = params['instance']
         sess_manager = instance.sess_manager
         self.failIfIs(None, sess_manager)
 
     def test_server_has_authorisation_store(self):
-        """ GracieServer should have a consumer_auth_store attribute """
+        """ GracieServer should have a consumer_auth_store attribute. """
         params = self.valid_servers['simple']
         instance = params['instance']
         consumer_auth_store = instance.consumer_auth_store
         self.failIfIs(None, consumer_auth_store)
 
     def test_serve_forever_is_callable(self):
-        """ GracieServer.serve_forever should be callable """
+        """ GracieServer.serve_forever should be callable. """
         self.failUnless(callable(self.server_class.serve_forever))
+
+    def test_returns_http_server_socket_fileno(self):
+        """ Should return fileno of HTTP server socket. """
+        params = self.valid_servers['simple']
+        instance = params['instance']
+        expect_fileno = instance.httpserver.fileno()
+        fileno = instance.socket_fileno()
+        self.failUnlessEqual(expect_fileno, fileno)

@@ -34,6 +34,10 @@ class Stub_GracieServer(object):
 
     def __init__(self, socket_params, opts):
         """ Set up a new instance. """
+        self._socket_fileno = 753
+
+    def socket_fileno(self):
+        return self._socket_fileno
 
     def serve_forever(self):
         pass
@@ -116,6 +120,7 @@ def setup_gracie_fixtures(testcase):
             )
         params['args'] = args
         instance = testcase.app_class(**args)
+        instance.server = Stub_GracieServer(None, None)
         params['instance'] = instance
 
 
@@ -390,6 +395,7 @@ class Gracie_become_daemon_TestCase(scaffold.TestCase):
         expect_pidfile = self.mock_lockfile
         expect_files_preserve = [
             sys.stderr,
+            instance.server.socket_fileno(),
             ]
         expect_mock_output = """\
             ...

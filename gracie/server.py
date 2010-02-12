@@ -27,10 +27,10 @@ _logger = logging.getLogger("gracie.server")
 
 
 class GracieServer(object):
-    """ Server for Gracie OpenID provider service """
+    """ Server for Gracie OpenID provider service. """
 
     def __init__(self, socket_params, opts):
-        """ Set up a new instance """
+        """ Set up a new instance. """
         self.version = version.version_full
         self.opts = opts
         self._setup_logging()
@@ -44,7 +44,7 @@ class GracieServer(object):
         self.consumer_auth_store = ConsumerAuthStore()
 
     def _setup_openid(self):
-        """ Set up OpenID parameters """
+        """ Set up OpenID parameters. """
         store = OpenIDStore(self.opts.datadir)
         self.openid_server = OpenIDServer(store)
 
@@ -52,13 +52,18 @@ class GracieServer(object):
         _logger.info("Exiting Gracie server")
 
     def _setup_logging(self):
-        """ Set up logging for this server """
+        """ Set up logging for this server. """
         server_version = self.version
         _logger.info(
             "Starting Gracie server (version %(server_version)s)"
             % vars()
             )
 
+    def socket_fileno(self):
+        """ Get the file descriptor for this server's network socket. """
+        fileno = self.httpserver.fileno()
+        return fileno
+
     def serve_forever(self):
-        """ Begin serving requests indefinitely """
+        """ Begin serving requests indefinitely. """
         self.httpserver.serve_forever()
