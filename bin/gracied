@@ -130,7 +130,10 @@ class Gracie(object):
         """ Turn the running program into a daemon process. """
         pidfile_path = os.path.join(os.getcwd(), self.opts.pidfile)
         pidfile = pidlockfile.PIDLockFile(pidfile_path)
-        files_preserve = [sys.stderr]
+        files_preserve = [
+            sys.stderr,
+            self.server.socket_fileno(),
+            ]
         self.daemon_context = daemon.DaemonContext(
             files_preserve=files_preserve,
             pidfile=pidfile,
