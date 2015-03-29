@@ -1,7 +1,6 @@
 semantic.cache
 .coverage
 MANIFEST
-MANIFEST.in
 *.egg-info
 *.egg
 PKG-INFO
@@ -11,4 +10,3 @@ PKG-INFO
 ./doc/*.html
 ./doc/*.png
 ./doc/*.[1-8]
-./gracie/version/version_info.py

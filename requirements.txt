@@ -1,0 +1,4 @@
+docutils>=0.6
+python-daemon>=1.4.5
+python-openid>=1.2
+Routes>=1.6.3

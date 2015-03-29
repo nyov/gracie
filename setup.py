@@ -85,14 +85,14 @@ class BuildDocumentationCommand(distutils.cmd.Command):
                 'func': render_rst_document,
                 'source_name_option': 'html_src_files',
                 'writer_name': 'html',
-                'source_suffix_regex': re.compile("\.txt$"),
+                'source_suffix_regex': re.compile("\.rst$"),
                 'dest_suffix': ".html",
                 },
             'manpage.8': {
                 'func': render_rst_document,
                 'source_name_option': 'manpage_8_src_files',
                 'writer_name': 'manpage',
-                'source_suffix_regex': re.compile("\.8\.txt$"),
+                'source_suffix_regex': re.compile("\.8\.rst$"),
                 'dest_suffix': ".8",
                 },
             'logo': {

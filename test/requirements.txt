@@ -1,0 +1,2 @@
+# Tests requirements
+MiniMock>=1.2.2

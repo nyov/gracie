@@ -1,0 +1,13 @@
+semantic.cache
+.coverage
+MANIFEST
+*.egg-info
+*.egg
+*.pyc
+PKG-INFO
+build
+dist
+*-stamp
+doc/*.html
+doc/*.png
+doc/*.[1-8]

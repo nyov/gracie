@@ -30,6 +30,8 @@ Requirements
 * `Docutils`_ >= 0.6
   (for rendering the documentation)
 
+* graphicsmagick for rendering the svg logo
+
 ..  _Python: http://www.python.org/
 ..  _python-openid: http://pypi.python.org/pypi/python-openid/
 ..  _PyPAM: http://www.pangalactic.org/PyPAM/

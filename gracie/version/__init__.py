@@ -10,7 +10,10 @@
 
 """ Version information for the Gracie package. """
 
-from version_info import version_info
+from datetime import datetime
+version_info = {}
+version_info['date'] = str(datetime.now())
+version_info['revno'] = '2'
 
 version_info['version_string'] = "0.2.12"
 
